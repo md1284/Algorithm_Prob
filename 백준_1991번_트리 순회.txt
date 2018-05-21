@@ -1,0 +1,112 @@
+#include <iostream>
+#include <vector>
+#include <Windows.h>
+
+using namespace std;
+
+typedef struct bTreeNode
+{
+	char data;
+	struct bTreeNode * left;
+	struct bTreeNode * right;
+} BTreeNode;
+
+void preTraverse(BTreeNode * bt)
+{
+	if (bt == NULL)
+		return;
+
+	printf("%c", bt->data);
+	preTraverse(bt->left);
+	preTraverse(bt->right);
+}
+
+void InTraverse(BTreeNode * bt)
+{
+	if (bt == NULL)
+		return;
+
+	InTraverse(bt->left);
+	printf("%c", bt->data);
+	InTraverse(bt->right);
+}
+
+void postTraverse(BTreeNode * bt)
+{
+	if (bt == NULL)
+		return;
+
+	postTraverse(bt->left);
+	postTraverse(bt->right);
+	printf("%c", bt->data);
+}
+
+BTreeNode * MakeBTreeNode(void)
+{
+	BTreeNode * bt = (BTreeNode *)malloc(sizeof(BTreeNode));
+	bt->left = NULL;
+	bt->right = NULL;
+
+	return bt;
+}
+
+BTreeNode * searchNode(BTreeNode * bt, char c)
+{
+	if (bt == NULL)
+		return NULL;
+	if (bt->data == c)
+		return bt;
+
+	BTreeNode * leftbt = searchNode(bt->left, c);
+	BTreeNode * rightbt = searchNode(bt->right, c);
+
+	if (leftbt != NULL)
+		return leftbt;
+	if (rightbt != NULL)
+		return rightbt;
+}
+
+int main(void)
+{
+	int n;
+	scanf("%d", &n);
+	BTreeNode * root = MakeBTreeNode();
+
+	for (int i = 0; i < n; i++)
+	{
+		BTreeNode * leftbt = MakeBTreeNode();
+		BTreeNode * rightbt = MakeBTreeNode();
+		char a, b, c;
+		getchar();
+		scanf("%c %c %c", &a, &b, &c);
+
+		leftbt->data = b;
+		rightbt->data = c;
+
+		if (b == '.')
+			leftbt = NULL;
+		if (c == '.')
+			rightbt = NULL;
+		if (i == 0)
+		{
+			root->data = a;
+			root->left = leftbt;
+			root->right = rightbt;
+			continue;
+		}
+
+		BTreeNode * bt = searchNode(root, a);
+		bt->left = leftbt;
+		bt->right = rightbt;
+	}
+
+	preTraverse(root);
+	printf("\n");
+	InTraverse(root);
+	printf("\n");
+	postTraverse(root);
+
+	system("pause");
+	return 0;
+}
+

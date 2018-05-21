@@ -1,0 +1,62 @@
+#include <stdio.h>
+#include <Windows.h>
+
+int change(int chcost)
+{
+	int ch = 0, totalch = 0;
+
+	ch += chcost / 500;
+	chcost -= ch * 500;
+
+	totalch += ch;
+	ch = 0;
+
+	ch += chcost / 100;
+	chcost -= ch * 100;
+
+	totalch += ch;
+	ch = 0;
+
+	ch += chcost / 50;
+	chcost -= ch * 50;
+
+	totalch += ch;
+	ch = 0;
+
+	ch += chcost / 10;
+	chcost -= ch * 10;
+
+	totalch += ch;
+	ch = 0;
+
+	ch += chcost / 5;
+	chcost -= ch * 5;
+
+	totalch += ch;
+	ch = 0;
+
+	ch += chcost / 1;
+	chcost -= ch * 1;
+
+	totalch += ch;
+	ch = 0;
+
+	return totalch;
+}
+
+
+int main(void)
+{
+	int num, chnum;
+
+	scanf("%d", &num);
+
+	num = 1000 - num;
+
+	chnum = change(num);
+
+	printf("%d", chnum);
+
+	system("pause");
+	return 0;
+}

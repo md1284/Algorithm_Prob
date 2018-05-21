@@ -1,0 +1,72 @@
+#include <stdio.h>
+#include <vector>
+#include <windows.h>
+
+using namespace std;
+
+void inspection(void);
+void DFS(int n, int v);
+
+int visit[201];
+vector<int> G[201];
+int ins = 1;
+
+void inspection(void) {
+	int n, m;
+	scanf("%d", &n);
+	scanf("%d", &m);
+
+	for (int i = 1; i <= m; i++) {
+		int a, b;
+		scanf("%d %d", &a, &b);
+
+		G[a].push_back(b);
+		G[b].push_back(a);
+	}
+
+	DFS(1, 1);
+}
+
+void DFS(int n, int v) {
+	if (ins == 0)
+		return;
+
+	if (v == 1)
+		visit[n] = 2;
+	else if (v == 2)
+		visit[n] = 1;
+
+	printf("node : %d visit[n] : %d\n", n, visit[n]);
+
+
+	for (int i = 0; i < G[n].size(); i++) {
+		if (visit[G[n][i]] == visit[n]) {
+			ins = 0;
+			return;
+		}
+		else if (visit[G[n][i]] == 0) {
+			DFS(G[n][i], visit[n]);
+		}
+	}
+}
+
+int main() {
+	int n;
+	scanf("%d", &n);
+
+	for (int i = 1; i <= n; i++) {
+		ins = 1;
+		inspection();
+
+		printf("Case#%d\n", i);
+		printf("%d\n", ins);
+
+		for (int j = 0; j < 202; j++) {
+			visit[j] = 0;
+			G[j].clear();
+		}
+	}
+
+	system("pause");
+	return 0;
+}

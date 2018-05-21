@@ -1,0 +1,180 @@
+# include <stdio.h>
+# include <math.h>
+# include <string.h>
+
+
+#define TEST
+#ifdef TEST
+# include <time.h>
+#endif
+
+typedef struct __complex_number__
+{
+	double real;
+	double img;
+}Complex;
+
+Complex idol[262144];
+Complex fan[262144];
+Complex result[262144];
+
+
+
+Complex Even18[131072];
+Complex Even17[65536];
+Complex Even16[32768];
+Complex Even15[16384];
+Complex Even14[8192];
+Complex Even13[4096];
+Complex Even12[2048];
+Complex Even11[1024];
+Complex Even10[512];
+Complex Even9[256];
+Complex Even8[128];
+Complex Even7[64];
+Complex Even6[32];
+Complex Even5[16];
+Complex Even4[8];
+Complex Even3[4];
+Complex Even2[2];
+Complex Even1[1];
+Complex Odd18[131072];
+Complex Odd17[65536];
+Complex Odd16[32768];
+Complex Odd15[16384];
+Complex Odd14[8192];
+Complex Odd13[4096];
+Complex Odd12[2048];
+Complex Odd11[1024];
+Complex Odd10[512];
+Complex Odd9[256];
+Complex Odd8[128];
+Complex Odd7[64];
+Complex Odd6[32];
+Complex Odd5[16];
+Complex Odd4[8];
+Complex Odd3[4];
+Complex Odd2[2];
+Complex Odd1[1];
+Complex* Even[18] = {
+	Even1,Even2, Even3, Even4, Even5, Even6, Even7, Even8, Even9,Even10,Even11, Even12, Even13, Even14, Even15, Even16, Even17, Even18
+};
+Complex * Odd[18] = {
+	Odd1,Odd2, Odd3, Odd4, Odd5, Odd6, Odd7, Odd8, Odd9,Odd10,Odd11, Odd12, Odd13, Odd14, Odd15, Odd16, Odd17, Odd18
+};
+
+Complex multiple(Complex * c1, Complex * c2)
+{
+	Complex temp;
+	temp.real = c1->real*c2->real - c1->img * c2->img;
+	temp.img = c1->real*c2->img + c1->img * c2->real;
+	return temp;
+}
+
+
+void fft(Complex * arr, Complex w, int n)
+{
+	int i;
+	int mid;
+	Complex wPower = { 1.0,0.0 };
+	Complex temp;
+	if (n == 0)
+		return;
+	n--;
+	mid = 1 << n;
+	for (i = 0; i < mid; i++) {
+		Even[n][i] = arr[2 * i];
+		Odd[n][i] = arr[2 * i + 1];
+	}
+
+	fft(Even[n], multiple(&w, &w), n);
+	fft(Odd[n], multiple(&w, &w), n);
+
+	for (i = 0; i < mid; i++) {
+		temp = multiple(&wPower, &Odd[n][i]);
+		arr[i].real = Even[n][i].real + temp.real;
+		arr[i].img = Even[n][i].img + temp.img;
+		arr[i + mid].real = Even[n][i].real - temp.real;
+		arr[i + mid].img = Even[n][i].img - temp.img;
+		wPower = multiple(&wPower, &w);
+	}
+	return;
+}
+
+int main()
+{
+	int testCaseCount;
+	int totalIdolCount, totalFanCount;
+	int allHugCount;
+	int buffer;
+	int i, n;
+	Complex Omega, InvOmega;
+	const Complex Male = { 1.0,0.0 }, Female = { 0.0,0.0 };
+	const double Pi = 3.141592653589793238462643;
+#ifdef TEST
+	clock_t sclock, eclock;
+#endif
+
+
+	scanf("%d", &testCaseCount);
+	getchar();
+	for (; --testCaseCount >= 0;) {
+		allHugCount = totalIdolCount = totalFanCount = 0;
+		while ((buffer = getchar()) != '\n') {
+			if (buffer == 'F')
+				idol[totalIdolCount++] = Female;
+			else
+				idol[totalIdolCount++] = Male;
+		}
+		while ((buffer = getchar()) != '\n') {
+			if (buffer == 'F')
+				fan[totalFanCount++] = Female;
+			else
+				fan[totalFanCount++] = Male;
+		}
+#ifdef TEST
+		sclock = clock();
+#endif
+
+		buffer = 1;
+		n = 0;
+		
+		while (buffer < totalFanCount) {
+			buffer <<= 1;
+			n++;
+		}
+
+
+
+		Omega.real = cosl(2 * Pi / buffer);
+		Omega.img = sinl(2 * Pi / buffer);
+		InvOmega.real = Omega.real;
+		InvOmega.img = -Omega.img;
+
+		fft(idol, InvOmega, n);
+		fft(fan, Omega, n);
+		for (i = 0; i < buffer; i++) {
+			result[i] = multiple(&idol[i], &fan[i]);
+		}
+		fft(result, InvOmega, n);
+
+
+		for (i = 0; i <= totalFanCount - totalIdolCount; i++) {
+			result[i].real /= (double)buffer;
+			if (result[i].real < 0.5)
+				allHugCount++;
+		}
+
+		memset(idol, 0, sizeof(Complex)*buffer);
+		memset(fan, 0, sizeof(Complex)*buffer);
+#ifdef TEST
+		eclock = clock();
+#endif
+		printf("%d\n", allHugCount);
+#ifdef TEST
+		printf("%.6lf sec\n", (double)(eclock - sclock) / CLOCKS_PER_SEC);
+#endif
+		
+	}
+	return 0;
+}

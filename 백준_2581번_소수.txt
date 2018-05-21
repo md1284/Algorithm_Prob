@@ -1,0 +1,39 @@
+import java.util.*;
+
+public class Main {
+	
+	boolean isPrime(int n) {
+		if(n == 1)
+			return false;
+		
+		for(int i=2; i*i<=n; i++) {
+			if(n%i == 0)
+				return false;
+		}
+		return true;		
+	}
+	
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+		int m = sc.nextInt();
+		int n = sc.nextInt();
+		int ins = 0;
+		int sum = 0;
+
+		Main p = new Main();
+		
+		for(int i=m; i<=n; i++) {
+			if(p.isPrime(i))
+				sum += i;
+			if(ins == 0 && p.isPrime(i))
+				ins = i;
+		}
+		
+		if(ins == 0)
+			System.out.println(-1);
+		else {
+			System.out.println(sum);
+			System.out.println(ins);
+		}
+	}
+}

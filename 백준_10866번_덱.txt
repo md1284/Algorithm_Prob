@@ -1,0 +1,125 @@
+#include <stdio.h>
+#include <windows.h>
+
+int arr[10000];
+int f = 0, r = 1;
+
+void push_front(void)
+{
+	int n;
+	scanf("%d", &n);
+	arr[++f] = n;
+}
+
+void push_back(void)
+{
+	int n, i;
+
+	for (i = f; i >= r; i--)
+		arr[i + 1] = arr[i];
+	
+	f++;
+
+	scanf("%d", &n);
+	arr[r] = n;
+}
+
+void pop_front(void)
+{
+	if (r > f)
+		printf("-1\n");
+	else
+	{
+		printf("%d\n", arr[f]);
+		arr[f] = -99;
+		f--;
+	}
+}
+
+void pop_back(void)
+{
+	if (r > f)
+		printf("-1\n");
+	else
+	{
+		printf("%d\n", arr[r]);
+		arr[r] = -99;
+		r++;
+	}
+}
+
+void size(void)
+{
+	printf("%d\n", f - r + 1);
+}
+
+void empty(void)
+{
+	if (r > f)
+		printf("1\n");
+
+	else
+		printf("0\n");
+}
+
+void front(void)
+{
+	if (r > f)
+		printf("-1\n");
+	else
+		printf("%d\n", arr[f]);
+}
+
+void back(void)
+{
+	if (r > f)
+		printf("-1\n");
+	else
+		printf("%d\n", arr[r]);
+}
+
+int main(void)
+{
+	int n, i;
+	char str[11];
+
+	scanf("%d", &n);
+
+	for (i = 0; i < n; i++)
+	{
+		scanf("%s", str);
+
+		if ((str[0] == 'p') && (str[1] == 'u'))
+		{
+			if (str[5] == 'f')
+				push_front();
+
+			if (str[5] == 'b')
+				push_back();
+		}
+
+		if ((str[0] == 'p') && (str[1] == 'o'))
+		{
+			if (str[4] == 'f')
+				pop_front();
+
+			if (str[4] == 'b')
+				pop_back();
+		}
+
+		if (str[0] == 's')
+			size();
+
+		if (str[0] == 'e')
+			empty();
+
+		if (str[0] == 'f')
+			front();
+
+		if (str[0] == 'b')
+			back();
+	}
+
+	system("pause");
+	return 0;
+}

@@ -1,0 +1,162 @@
+#include <stdio.h>
+#include <Windows.h>
+
+#define TRUE 1
+#define FALSE 0
+
+typedef struct _numxy
+{
+	int x;
+	int y;
+} numxy;
+
+numxy findone(void);
+int bfs(numxy P);
+
+char arr[26][26];
+char visit[26][26];
+int n;
+int arrsize;
+
+numxy findone(void)
+{
+	numxy P;
+	int i, j;
+
+	for (i = 0; i < n; i++)
+	{
+		for (j = 0; j < n; j++)
+		{
+			if (arr[i][j] == 1)
+			{
+				P.x = j;
+				P.y = i;
+				return P;
+			}
+		}
+	}
+}
+
+int bfs(numxy P)
+{
+	if (visit[P.y][P.x] == FALSE)
+	{
+		arr[P.y][P.x] = 0;
+		visit[P.y][P.x] = TRUE;
+		arrsize++;
+	}
+	else
+		return 0;
+	
+	if ((P.y < n - 1) && (P.y >= 0))
+	{
+		if (arr[P.y + 1][P.x] == 1)
+		{
+			numxy R = P;
+			R.y += 1;
+			bfs(R);
+		}
+	}
+	
+	if ((P.y <= n - 1) && (P.y > 0))
+	{
+		if (arr[P.y - 1][P.x] == 1)
+		{
+			numxy R = P;
+			R.y -= 1;
+			bfs(R);
+		}
+	}
+	
+	if ((P.x < n - 1) && (P.x >= 0))
+	{
+		if (arr[P.y][P.x + 1] == 1)
+		{
+			numxy R = P;
+			R.x += 1;
+			bfs(R);
+		}
+	}
+	
+	if ((P.x <= n - 1) && (P.x >= 0))
+	{
+		if (arr[P.y][P.x - 1] == 1)
+		{
+			numxy R = P;
+			R.x -= 1;
+			bfs(R);
+		}
+	}
+}
+
+
+
+int main()
+{
+	numxy P;
+	int i, j, k, cnt, temp, idx = 0, check = 0;
+	int str[700];
+
+	scanf("%d", &n);
+
+	cnt = n*n;
+
+	getchar();
+
+	for (i = 0; i < n; i++)
+	{
+		for (j = 0; j < n; j++)
+		{
+			scanf("%c", &arr[i][j]);
+			arr[i][j] -= 48;
+		}
+		getchar();
+	}
+
+	k = 0;
+	
+	while (check != cnt)
+	{
+		check = 0;
+
+		P = findone();
+
+		bfs(P);
+		
+		str[k] = arrsize;
+		idx++;
+		k++;
+		arrsize = 0;
+
+		for (i = 0; i < n; i++)
+		{
+			for (j = 0; j < n; j++)
+			{
+				if (arr[i][j] == 0)
+					check++;
+			}
+		}
+	}
+
+	for (i = 0; i < idx; i++)
+	{
+		for (j = 0; j < i;j++)
+		{
+			if (str[i] <= str[j])
+			{
+				temp = str[i];
+				str[i] = str[j];
+				str[j] = temp;
+			}
+		}
+	}
+
+	printf("%d\n", idx);
+
+	for (i = 0;i < idx; i++)
+		printf("%d\n", str[i]);
+
+
+	system("pause");
+	return 0;
+}

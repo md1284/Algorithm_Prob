@@ -1,0 +1,132 @@
+#include <stdio.h>
+#include <windows.h>
+
+using namespace std;
+
+typedef struct Index {
+	int mi, mj;
+	int mn;
+} Index;
+
+Index FindMax_1(int i, int j, int n);
+int Find(int i, int j, int n, int k);
+int FindMaxTree(void);
+void DrawTree(void);
+
+int Tree[102][102];
+int r, c, k;
+int max;
+int sum = 0;
+
+void DrawTree(void) {
+	scanf("%d %d %d", &r, &c, &k);
+
+	for (int i = 1; i < 102; i++) {
+		for (int j = 1; j < 102; j++) {
+			Tree[i][j] = 0;
+		}
+	}
+	sum = 0;
+	max = 0;
+
+	getchar();
+
+	for (int i = 1; i <= r; i++) {
+		for (int j = 1; j <= c; j++) {
+			char ch;
+			scanf("%c", &ch);
+			if (ch == '.')
+				Tree[i][j] = 0;
+			else
+				Tree[i][j] = 1;
+		}
+		getchar();
+	}
+	printf("\n");
+}
+
+Index FindMax_1(int i, int j, int n) {
+	if (i > r) {
+		Index idx;
+		idx.mi = i;
+		idx.mj = j;
+		idx.mn = n;
+		return idx;
+	}
+
+	for (int x = j - n; x <= j + n; x++) {
+		if (Tree[i][x] == 0) {
+			Index idx;
+			idx.mi = i;
+			idx.mj = j;
+			idx.mn = n;
+			return idx;
+		}
+	}
+
+	sum += n * 2 + 1;
+	return FindMax_1(i + 1, j, n + 1);
+}
+
+int Find(int i, int j, int n, int k) {
+	int sum[102];
+	
+	if (k <= 0) {
+		printf("종료\n");
+		return;
+	}
+
+	printf("꼭짓점 i : %d , j : %d k : %d\n", i, j, k);
+
+	Index idx;
+	idx.mi = i;
+	idx.mj = j;
+	idx.mn = n;
+
+	idx = FindMax_1(idx.mi, idx.mj, idx.mn);
+
+	for (int a = idx.mj - idx.mn + 1; a <= idx.mj + idx.mn - 1; a++) {
+		if (Tree[idx.mi][a] == 0)
+			continue;
+
+		Find(idx.mi, a, 0, k - 1);
+	}
+
+	printf("아래가 없는 경우\n");
+}
+
+int FindMaxTree(void) {
+	DrawTree();
+
+	for (int i = 1; i <= r; i++) {
+		for (int j = 1; j <= c; j++) {
+			if (Tree[i][j] == 0)
+				continue;
+
+			Find(i, j, 0, k);
+
+
+			if (sum > max) {
+				max = sum;
+			}
+
+			sum = 0;
+		}
+	}
+
+	return max;
+}
+
+int main(void) {
+	FILE * fp = fopen("output.txt", "w");
+
+	int n;
+	scanf("%d", &n);
+
+	for (int i = 0; i < n; i++) {
+		fprintf(fp, "Case #%d: %d\n", i + 1, FindMaxTree());
+	}
+
+	system("pause");
+	return 0;
+}

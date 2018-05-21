@@ -1,0 +1,43 @@
+#include <stdio.h>
+#include <vector>
+#include <windows.h>
+
+using namespace std;
+
+vector<int> G[501];
+int list[501];
+int n, m;
+int cnt;
+
+int main(void) {
+	scanf("%d %d", &n, &m);
+
+	for (int i = 0; i < m; i++) {
+		int a, b;
+		scanf("%d %d", &a, &b);
+		G[a].push_back(b);
+		G[b].push_back(a);
+	}
+
+	for (int i = 0; i < G[1].size(); i++) {
+		list[G[1][i]] = 1;
+
+		for (int j = 0; j < G[G[1][i]].size(); j++) {
+			if (list[G[G[1][i]][j]] == 1)
+				continue;
+
+			list[G[G[1][i]][j]] = 1;
+		}
+	}
+	
+	for (int i = 1; i <= n; i++) {
+		if (list[i] == 1) {
+			cnt++;
+		}
+	}
+
+	printf("%d", cnt-1);
+
+	system("pause");
+	return 0;
+}

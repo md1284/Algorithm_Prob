@@ -1,0 +1,54 @@
+#include <stdio.h>
+#include <queue>
+#include <Windows.h>
+
+// x = x + 1
+// x = x - 1
+// x = 2 * x
+using namespace std;
+
+int  N, K;
+int smin = 200000;
+int visit[200010];
+queue<int> q;
+
+void BFS(int start) {
+	int cntime = 0;
+	q.push(start);
+	visit[start] = 1;
+
+	while (!q.empty()) {
+		int cur = q.front();
+
+		if (cur == K) {
+			smin = visit[cur] - 1;
+			return;
+		}
+
+		if (visit[cur + 1] == 0 && cur + 1 <= 100000) {
+			visit[cur + 1] = visit[cur] + 1;
+			q.push(cur + 1);
+		}
+		if (visit[cur * 2] == 0 && cur * 2 <= 200000 && cur != 0) {
+			visit[cur * 2] = visit[cur] + 1;
+			q.push(cur * 2);
+		}
+		if (visit[cur - 1] == 0 && cur - 1 >= 0) {
+			visit[cur - 1] = visit[cur] + 1;
+			q.push(cur - 1);
+		}
+
+		q.pop();
+	}
+}
+
+
+int main(void) {
+	scanf("%d %d", &N, &K);
+	BFS(N);
+
+	printf("%d", smin);
+
+	system("pause");
+	return 0;
+}

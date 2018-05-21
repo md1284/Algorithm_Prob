@@ -1,0 +1,99 @@
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <algorithm>
+#include <Windows.h>
+
+using namespace std;
+
+vector<int> G[1001];
+queue<int> q;
+int visit[1001];
+
+void DFS(int start)
+{
+	visit[start] = 1;
+	printf("%d ", start);
+
+	for (int i = 0; i < G[start].size(); i++)
+	{
+		if (visit[G[start][i]] == 0)
+		{
+			visit[G[start][i]] = 1;
+			DFS(G[start][i]);
+		}
+	}
+}
+
+void BFS(int start)
+{
+	q.push(start);
+	visit[start] = 1;
+	printf("%d ", start);
+
+	while (!q.empty())
+	{
+		int cur = q.front();
+
+		for (int i = 0; i < G[cur].size(); i++)
+		{
+			if (visit[G[cur][i]] == 0)
+			{
+				visit[G[cur][i]] = 1;
+				printf("%d ", G[cur][i]);
+				q.push(G[cur][i]);
+			}
+		}
+
+		q.pop();
+	}
+}
+
+void GSort(int n)
+{
+	for (int i = 1; i <= n; i++)
+	{
+		for (int j = 0; j < G[i].size(); j++)
+		{
+			for (int z = 0; z < j; z++)
+			{
+				if (G[i][j] < G[i][z])
+				{
+					int temp = G[i][j];
+					G[i][j] = G[i][z];
+					G[i][z] = temp;
+				}
+			}
+		}
+	}
+}
+
+
+int main(void)
+{
+	
+	int n, m, start;
+	scanf("%d %d %d", &n, &m, &start);
+
+	for (int i = 0; i < m; i++)
+	{
+		int s, t;
+		scanf("%d %d", &s, &t);
+
+		G[s].push_back(t);
+		G[t].push_back(s);
+	}
+	
+	GSort(n);
+
+	DFS(start);
+	printf("\n");
+
+	for (int i = 1; i <= n; i++)
+		visit[i] = 0;
+	
+	BFS(start);
+
+	system("pause");
+	return 0;
+}

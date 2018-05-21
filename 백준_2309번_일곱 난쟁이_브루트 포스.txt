@@ -1,0 +1,58 @@
+#include <stdio.h>
+#include <Windows.h>
+#include <algorithm>
+
+using namespace std;
+
+void bruteforce(int arr[])
+{
+	int i, j, k, z, temp, idx = 0, check = 0;
+	int ary[7];
+
+	for (i = 0; i < 9; i++)
+	{
+		for (j = i + 1; j < 9; j++)
+		{
+			for (k = 0; k < 9; k++)
+			{
+				if ((k != i) && (k != j))
+				{
+					check += arr[k];
+					ary[idx] = k;
+					idx++;
+				}
+			}
+
+			if (check == 100)
+			{
+				for (k = 0; k < 7; k++)
+					printf("%d\n", arr[ary[k]]);
+			}
+
+			idx = 0;
+			check = 0;
+
+			for (k = 0; k < 7; k++)
+				ary[k] = 0;
+
+		}
+	}
+}
+
+
+
+int main()
+{
+	int arr[9];
+	int i;
+
+	for (i = 0;i < 9;i++)
+		scanf("%d", &arr[i]);
+
+	sort(arr, arr + 9);
+
+	bruteforce(arr);
+
+	system("pause");
+	return 0;
+}

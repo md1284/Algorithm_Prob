@@ -1,0 +1,74 @@
+#include <stdio.h>
+#include <string.h>
+#include <time.h>
+#include <windows.h>
+
+using namespace std;
+
+typedef unsigned long long Bint;
+
+char str[101];
+int arr[101];
+int ary[101];
+int len;
+Bint cnt, Li, Lj;
+
+int main(void) {
+	FILE * rfp = fopen("input.txt", "r");
+	FILE * fp = fopen("output.txt", "w");
+	clock_t sclock, eclock;
+	sclock = clock();
+	printf("cnt %lld\n", cnt);
+
+	int num;
+	fscanf(rfp, "%d", &num);
+
+	for (int i = 0; i < num; i++) {
+		printf("Case #%d Start\n", i + 1);
+		cnt = 0;
+
+		fscanf(rfp, "%s", str);
+		fscanf(rfp, "%lld %lld", &Li, &Lj);
+
+		len = strlen(str);
+		
+		for (int j = 0; j < len; j++) {
+			if (str[j] == 'B')
+				arr[j + 1] = 1;
+			else
+				arr[j + 1] = 0;
+		}
+
+		Bint temp = Li%len;
+		if (temp == 0)
+			temp = len;
+		
+		int k = 1;
+		for (int j = temp; j <= len; j++)
+			ary[k++] = arr[j];
+		for (int j = 1; j < temp; j++)
+			ary[k++] = arr[j];
+
+		temp = 0;
+		for (int j = 1; j <= len; j++) {
+			if (ary[j] == 1)
+				temp++;
+		}
+
+		temp = ((Lj - Li + 1) / len) * temp;
+		cnt = temp;
+
+		for (int j = 1; j <= (Lj - Li + 1) % len; j++) {
+			if (ary[j] == 1)
+				cnt++;
+		}
+
+		fprintf(fp, "Case #%d: %lld\n", i + 1, cnt);
+	}
+
+
+	eclock = clock();
+	printf("%.6lf second. Clear!!\n", (double)(eclock - sclock) / CLOCKS_PER_SEC);
+	system("pause");
+	return 0;
+}

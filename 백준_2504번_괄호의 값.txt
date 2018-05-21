@@ -1,0 +1,102 @@
+#include <iostream>
+#include <stdlib.h>
+#include <stack>
+#include <Windows.h>
+
+using namespace std;
+
+int main(void)
+{
+	stack<int> st;
+	char arr[1000000];
+	scanf("%s", arr);
+
+	for (int i = 0; i < strlen(arr); i++) {
+		if (arr[i] == '(')
+			st.push(arr[i]);
+		else if (arr[i] == '[')
+			st.push(arr[i]);
+		else if (arr[i] == ')') {
+			if (st.top() == '(') {
+				st.pop();
+				st.push(2);
+			}
+			else if (st.top() == '[') {
+				printf("0");
+				system("pause");
+				return 0;
+			}
+			else {
+				int x = st.top();
+				st.pop();
+
+				if (st.top() == '(') {
+					st.pop();
+					x = x * 2;
+					st.push(x);
+				}
+				else {
+					printf("0");
+					system("pause");
+					return 0;
+				}
+			}
+		}
+		else if (arr[i] == ']') {
+			if (st.top() == '[') {
+				st.pop();
+				st.push(3);
+			}
+			else if (st.top() == '(') {
+				printf("0");
+				system("pause");
+				return 0;
+			}
+			else {
+				int x = st.top();
+				st.pop();
+
+				if (st.top() == '[') {
+					st.pop();
+					x = x * 3;
+					st.push(x);
+				}
+				else {
+					printf("0");
+					system("pause");
+					return 0;
+				}
+			}
+		}
+
+		if (st.top() != '(' && st.top() != '[') {
+			int temp1 = st.top();
+			st.pop();
+
+			if (st.size() >= 1) {
+				if (st.top() != '(' && st.top() != '[') {
+					int temp2 = st.top();
+					st.pop();
+					st.push(temp1 + temp2);
+				}
+				else
+					st.push(temp1);
+			}
+			else
+				st.push(temp1);
+		}
+	}
+
+	if (st.size() != 1) {
+		printf("0");
+		system("pause");
+		return 0;
+	}
+	else
+		printf("%d", st.top());
+
+
+	system("pause");
+	return 0;
+}
+

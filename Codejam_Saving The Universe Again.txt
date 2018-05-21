@@ -1,0 +1,74 @@
+#include <iostream>
+#include <string.h>
+#include <vector>
+#include <Windows.h>
+
+using namespace std;
+
+int cnt;
+
+bool inspection(int d, char * str);
+void swap(char * str, int i, int j);
+int comDam(char * str);
+
+bool inspection(int d, char * str) {
+	if (comDam(str) <= d)
+		return TRUE;
+
+	for (int i = strlen(str)-1; i > 0; i--) {
+		if (str[i] == 'S') {
+			if (str[i - 1] == 'C') {
+				swap(str, i, i-1);
+				cnt++;
+				if (comDam(str) <= d)
+					return TRUE;
+				i = strlen(str);
+			}
+		}
+	}
+	
+	return FALSE;
+}
+
+void swap(char * str, int i, int j) {
+	char temp = str[i];
+	str[i] = str[j];
+	str[j] = temp;
+}
+
+int comDam(char * str) {
+	int totalDam = 0;
+	int curDam = 1;
+
+	for (int i = 0; i < strlen(str); i++) {
+		if (str[i] == 'S')
+			totalDam += curDam;
+		else
+			curDam *= 2;
+	}
+	return totalDam;
+}
+
+int main(void) {
+	int t;
+
+	scanf("%d", &t);
+
+	for (int i = 0; i < t; i++) {
+		int d;
+		char * str = (char *)malloc(sizeof(char) * 30);
+
+		scanf("%d %s", &d, str);
+
+		if (inspection(d, str))
+			printf("Case #%d: %d\n", i + 1, cnt);
+		else
+			printf("Case #%d: IMPOSSIBLE\n", i + 1);
+		cnt = 0;
+
+		free(str);
+	}
+
+	system("pause");
+	return 0;
+}

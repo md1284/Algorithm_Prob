@@ -1,0 +1,75 @@
+#include <stdio.h>
+#include <windows.h>
+
+int arr[10000];
+int t=0;
+
+
+void push(void)
+{
+	int n;
+
+	scanf_s("%d", &n);
+
+	arr[++t] = n;
+}
+
+void pop(void)
+{
+	if (t <= 0)
+		printf("-1\n");
+
+	else
+	{
+		printf("%d\n", arr[t]);
+		t--;
+	}
+}
+
+void top(void)
+{
+	if (t <= 0)
+		printf("-1\n");
+
+	else
+	{
+		printf("%d\n", arr[t]);
+	}
+}
+
+int main(void)
+{
+	int num, i;
+	char idx[10];
+
+	scanf_s("%d", &num);
+
+	for(i = 0; i < num; i++)
+	{
+		scanf_s("%s", &idx, sizeof(idx));
+
+		if ((idx[0] == 'p') && (idx[1] == 'u'))
+			push(idx[5]);
+
+		if ((idx[0] == 'p') && (idx[1] == 'o'))
+			pop();
+
+		if (idx[0] == 's')
+			printf("%d\n", t);
+
+		if (idx[0] == 'e')
+		{
+			if (t == 0)
+				printf("1\n");
+
+			else
+				printf("0\n");
+		}
+
+		if (idx[0] == 't')
+			top();
+	}
+	
+	system("pause");
+	return 0;
+}

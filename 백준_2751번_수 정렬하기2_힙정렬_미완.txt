@@ -1,0 +1,147 @@
+#include <stdio.h>
+#include <windows.h>
+
+typedef int PriorityComp(int d1, int d2);
+
+
+typedef struct _heap
+{
+	int numofdata;
+	int heaparr[100];
+	PriorityComp * comp;
+
+} Heap;
+
+int Getparentidx(int idx);
+int Getleftidx(int idx);
+int Getrightidx(int idx);
+int Pricomp(int n1, int n2);
+void Heapsort(int arr[], int n, PriorityComp pc);
+int Hempty(Heap * ph);
+int Getpriidx(Heap * ph, int idx);
+void Hinsert(Heap * ph, int data);
+int Hdelete(Heap * ph);
+int Pricomp(int n1, int n2);
+
+int Hempty(Heap *ph)
+{
+	if (ph->numofdata == 0)
+		return TRUE;
+	else
+		return FALSE;
+}
+
+int Getparentidx(int idx)
+{
+	return idx / 2;
+}
+
+int Getleftidx(int idx)
+{
+	return idx * 2;
+}
+
+int Getrightidx(int idx)
+{
+	return idx * 2 + 1;
+}
+
+int Getpriidx(Heap * ph, int idx)
+{
+	if (Getleftidx(idx) > ph->numofdata)
+		return 0;
+	else if (Getleftidx(idx) == ph->numofdata)
+		return Getleftidx(idx);
+	else
+	{
+		if (ph->comp(ph->heaparr[Getleftidx(idx)], ph->heaparr[Getrightidx(idx)]) < 0)
+			return Getrightidx(idx);
+		else
+			return Getleftidx(idx);
+	}
+}
+
+void Heapint(Heap * ph, PriorityComp pc)
+{
+	ph->numofdata = 0;
+	ph->comp = pc;
+}
+
+void Hinsert(Heap * ph, int data)
+{
+	int idx = ph->numofdata + 1;
+
+	while (idx != 1)
+	{
+		if (ph->comp(data, ph->heaparr[Getparentidx(idx)]) > 0)
+		{
+			ph->heaparr[idx] = ph->heaparr[Getparentidx(idx)];
+			idx = Getparentidx(idx);
+		}
+		else
+			break;
+	}
+
+	ph->heaparr[idx] = data;
+	ph->numofdata += 1;
+}
+
+int Hdelete(Heap * ph)
+{
+	int retdata = ph->heaparr[1];
+	int lastelem = ph->heaparr[ph->numofdata];
+
+	int parentidx = 1;
+	int childidx;
+
+	while (childidx = Getpriidx(ph, parentidx))
+	{
+		if (ph->comp(lastelem, ph->heaparr[childidx]) >= 0)
+			break;
+		ph->heaparr[parentidx] = ph->heaparr[childidx];
+		parentidx = childidx;
+	}
+
+	ph->heaparr[parentidx] = lastelem;
+	ph->numofdata -= 1;
+	return retdata;
+}
+
+int Pricomp(int n1, int n2)
+{
+	return n2 - n1;
+}
+
+void Heapsort(int arr[], int n, PriorityComp pc)
+{
+	Heap heap;
+	int i;
+
+	Heapint(&heap, pc);
+
+	for (i = 0; i < n; i++)
+		Hinsert(&heap, arr[i], i);
+
+
+	for (i = 0; i < n; i++)
+		arr[i] = Hdelete(&heap);
+}
+
+int main(void)
+{
+	char arr[1000000];
+	int n, i;
+
+	scanf("%d", &n);
+
+	for (i = 0; i < n; i++)
+		scanf("%d", &arr[i]);
+
+	Heapsort(arr, n, PriComp);
+
+	for (i = 0; i < n; i++)
+		printf("%d\n", arr[i]);	
+	
+	system("pause");
+	return 0;
+}

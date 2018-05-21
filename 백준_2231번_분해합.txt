@@ -1,0 +1,139 @@
+#include <stdio.h>
+#include <Windows.h>
+
+#define TRUE 1
+#define FALSE 0
+
+using namespace std;
+
+int num, gen, cnt;
+int arr[7];
+
+int sper(void);
+int calcul(void);
+int renum(void);
+void renumcount();
+
+int sper(void)
+{
+	if (cnt != 0)
+		cnt--;
+	else
+	{
+		printf("0");
+		system("pause");
+		return 0;
+	}
+
+	if (calcul() == TRUE)
+	{
+		printf("%d", gen);
+		system("pause");
+		return 0;
+	}
+	else
+	{
+		gen++;
+		sper();
+	}
+}
+
+int calcul(void)
+{
+	int cipher, sum = 0;
+	int i;
+
+	cipher = renum();
+
+	for (i = 0; i < cipher; i++)
+	{
+		sum += arr[i];
+	}
+
+	sum += gen;
+
+	if (sum == num)
+		return TRUE;
+	else
+		return FALSE;
+}
+
+int renum(void)
+{
+	int i, ins, rem, cipher = 0;
+	int str[7];
+
+	ins = gen;
+
+	for (i = 0; i < 7; i++)
+	{
+		if ((ins / 10) != 0)
+		{
+			rem = ins % 10;
+			str[i] = rem;
+			ins -= rem;
+			ins /= 10;
+			cipher++;
+		}
+
+		else
+		{
+			str[i] = ins;
+			cipher++;
+			break;
+		}
+	}
+
+
+	for (i = 0; i < cipher; i++)
+		arr[i] = str[cipher - i - 1];
+
+	return cipher;
+}
+
+void renumcount(void)
+{
+	int i, ins, rem, cipher = 0;
+	int str[7];
+
+	ins = num;
+
+	for (i = 0; i < 7; i++)
+	{
+		if ((ins / 10) != 0)
+		{
+			rem = ins % 10;
+			str[i] = rem;
+			ins -= rem;
+			ins /= 10;
+			cipher++;
+		}
+
+		else
+		{
+			str[i] = ins;
+			cipher++;
+			break;
+		}
+	}
+
+	for (i = 0; i < cipher; i++)
+		arr[i] = str[cipher - i - 1];
+
+	cnt = cipher * 9;
+	gen = num - cnt;
+}
+
+
+
+int main()
+{
+	scanf("%d", &num);
+
+	renumcount();
+	sper();
+
+
+	system("pause");
+	return 0;
+}

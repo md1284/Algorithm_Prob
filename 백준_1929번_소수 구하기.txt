@@ -1,0 +1,46 @@
+import java.util.*;
+
+public class Main {
+	
+	boolean isPrime(int n) {
+		if(n == 1)
+			return false;
+		
+		for(int i=2; i*i<=n; i++) {
+			if(n%i == 0)
+				return false;
+		}
+		return true;		
+	}
+	
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+		int m = sc.nextInt();
+		int n = sc.nextInt();
+		boolean[] a = new boolean[1000001];
+		Main q = new Main();
+		
+		for(int i=m; i<=n; i++)
+			a[i] = true;
+	
+		for(int i=m; i<=n; i++) {
+			if(a[i] == false)
+				continue;
+			
+			if(i == 1) {
+				a[i] = false;
+				continue;
+			}
+			
+			if(!q.isPrime(i)) {
+				for(int j=i; j<=n; j+=i)
+					a[j] = false;
+			}
+		}
+		
+		for(int i=m; i<=n; i++) {
+			if(a[i] == true)
+				System.out.println(i);
+		}
+	}
+}

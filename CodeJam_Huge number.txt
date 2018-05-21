@@ -1,0 +1,61 @@
+#include <stdio.h>
+#include <time.h>
+#include <windows.h>
+
+using namespace std;
+
+typedef long long Bint;
+
+Bint num, a, n, p;
+
+Bint Power(Bint x, Bint n) {
+	Bint temp;
+
+	if (n <= 0)
+		return 1;
+
+	temp = Power(x, n / 2);
+
+	if (temp >= p)
+		temp %= p;
+
+	if (n % 2 == 0)
+		return temp*temp;
+	else
+		return x*temp*temp;
+}
+
+int main(void) {
+	FILE * rfp = fopen("input.txt", "r");
+	FILE * fp = fopen("output.txt", "w");
+	clock_t sclock, eclock;
+	sclock = clock();
+
+	fscanf(rfp, "%d", &num);
+
+	for (int i = 0; i < num; i++) {
+		fscanf(rfp, "%d %d %d", &a, &n, &p);
+
+		if (a >= p)
+			a %= p;
+		
+		for (int j = 2; j <= n; j++) {
+			a = Power(a, j);
+		
+			if (a >= p)
+				a %= p;
+		}
+		if (a >= p)
+			a %= p;
+
+		printf("Case #%d Start\n", i + 1);
+		fprintf(fp, "Case #%d: %d\n", i + 1, a);
+	}
+
+
+
+	eclock = clock();
+	printf("%.6lf second. Clear!!\n", (double)(eclock - sclock) / CLOCKS_PER_SEC);
+	system("pause");
+	return 0;
+}

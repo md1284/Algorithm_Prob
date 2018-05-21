@@ -1,0 +1,40 @@
+#include <stdio.h>
+#include <Windows.h>
+
+int main(void)
+{
+	int num, temp, total = 0, i, j;
+	int arr[1001];
+
+	scanf("%d", &num);
+
+	for (i = 0; i < num; i++)
+		scanf("%d", &arr[i]);
+
+	
+	for (i = 0; i < num; i++)
+	{
+		for (j = 0; j < i; j++)
+		{
+			if (arr[i] < arr[j])
+			{
+				temp = arr[i];
+				arr[i] = arr[j];
+				arr[j] = temp;
+			}
+		}
+	}
+
+	j = num;
+
+	for (i = 0; i < num; i++)
+	{
+		total += arr[i] * j;
+		j--;
+	}
+
+	printf("%d", total);
+
+	system("pause");
+	return 0;
+}

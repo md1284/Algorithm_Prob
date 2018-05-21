@@ -1,0 +1,93 @@
+#include <stdio.h>
+#include <math.h>
+#include <algorithm>
+#include <vector>
+#include <time.h>
+#include <windows.h>
+
+using namespace std;
+
+double ver[10000][3];
+double a[10000], b[10000];
+double z, dmin;
+int minPos, cnt;
+
+double Find(void) {
+	double xx, yy, x, y;
+	double temp1, temp2;
+	
+	for (int i = 0; i < cnt; i++) {
+		xx = a[0]; yy = b[i];
+		x = (xx + yy) / 2; y = (-xx + yy) / 2;
+		z = 0;
+
+		for (int j = 0; j < cnt; j++) {
+			temp1 = ver[j][0] < x ? x - ver[j][0] : ver[j][0] - x;
+			temp2 = ver[j][1] < y ? y - ver[j][1] : ver[j][1] - y;
+			temp1 = temp1 > temp2 ? temp1 : temp2;
+			z += temp1 * ver[j][2];
+		}
+
+		if (i == 0) {
+			dmin = z;
+			minPos = i;
+		}
+		else if (dmin > z) {
+			dmin = z;
+			minPos = i;
+		}
+	}
+	for (int i = 0; i < cnt; i++) {
+		xx = a[i]; yy = b[minPos];
+		x = (xx + yy) / 2; y = (-xx + yy) / 2;
+		z = 0;
+
+		for (int j = 0; j < cnt; j++) {
+			temp1 = ver[j][0] < x ? x - ver[j][0] : ver[j][0] - x;
+			temp2 = ver[j][1] < y ? y - ver[j][1] : ver[j][1] - y;
+			temp1 = temp1 > temp2 ? temp1 : temp2;
+			z += temp1 * ver[j][2];
+		}
+
+		if (i == 0)
+			dmin = z;
+		else if (dmin > z)
+			dmin = z;
+	}
+	return dmin;
+}
+
+
+int main(void) {
+	FILE * rfp = fopen("input.txt", "r");
+	FILE * fp = fopen("output.txt", "w");
+	clock_t sclock, eclock;
+	sclock = clock();
+
+	int n;
+	fscanf(rfp, "%d", &n);
+
+	for (int i = 0; i < n; i++) {
+		int m;
+		fscanf(rfp, "%d", &m);
+		cnt = m;
+
+		for (int j = 0; j < cnt; j++) {
+			fscanf(rfp, "%lf %lf %lf", &ver[j][0], &ver[j][1], &ver[j][2]);
+			a[j] = ver[j][0] - ver[j][1];
+			b[j] = ver[j][0] + ver[j][1];
+		}
+
+		sort(a, a + cnt);
+		sort(b, b + cnt);
+
+		printf("Case %d : start\n", i);
+		fprintf(fp, "Case #%d: %lf\n", i + 1, Find());
+	}
+
+	eclock = clock();
+	printf("%.6lf second. Clear!!\n", (double)(eclock - sclock) / CLOCKS_PER_SEC);
+
+	system("pause");
+	return 0;
+}
