@@ -1,0 +1,58 @@
+#include <stdio.h>
+#include <vector>
+
+using namespace std;
+
+int c, n, m;
+int areFriend[11][11];
+int taken[11];
+
+int solve(int idx) {
+    int target = -1;
+    for(int i = idx; i<n; i++) {
+        if(taken[i] == 0) {
+            target = i;
+            break;
+        }
+    }
+    
+    if(target == -1)    return 1;
+    
+    int ret = 0;
+    for(int i = target+1; i<n; i++) {
+        if(areFriend[target][i] && !taken[i]) {
+            taken[target] = taken[i] = 1;
+            ret += solve(target+1);
+            taken[target] = taken[i] = 0;
+        }
+    }
+    
+    return ret;
+}
+
+void clear(void) {
+    for(int i = 0; i<11; i++) {
+        for(int j = 0; j<11; j++) {
+            areFriend[i][j] = 0;
+        }
+        taken[i] = 0;
+    }
+}
+
+int main() {
+    scanf("%d", &c);
+    
+    for(int i = 0; i<c; i++) {
+        scanf("%d %d", &n, &m);
+        for(int j = 0; j<m; j++) {
+            int a, b;
+            scanf("%d %d", &a, &b);
+            areFriend[a][b] = 1;
+            areFriend[b][a] = 1;
+        }
+        printf("%d\n", solve(0));
+        clear();
+    }
+
+    return 0;
+}
