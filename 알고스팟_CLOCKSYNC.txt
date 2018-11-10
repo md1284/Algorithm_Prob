@@ -1,0 +1,69 @@
+#include <stdio.h>
+#include <vector>
+
+using namespace std;
+
+const int INF = 987654321;
+
+int c;
+bool connect[10][16] = {
+    {1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 ,0 ,0, 0, 0},
+    {0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1 ,0 ,0, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0 ,0 ,0, 1, 1},
+    {1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0 ,0 ,0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0 ,1 ,0, 0, 0},
+    {1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 ,0 ,0, 1, 1},
+    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0 ,0 ,0, 1, 1},
+    {0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0 ,0 ,0, 1, 1},
+    {0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0 ,0 ,0, 0, 0},
+    {0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0 ,0 ,1, 0, 0}
+};
+int clock[16];
+
+bool check(int clock[]) {
+    for(int i = 0; i<16; i++) {
+        if(clock[i] != 0)
+            return false;
+    }
+    return true;
+}
+
+void moveclock(int idx, int clock[]) {
+    for(int i = 0; i<16; i++) {
+        if(connect[idx][i]) {
+            clock[i] += 3;
+            clock[i] %= 12;
+        }
+    }
+}
+
+int solve(int idx, int clock[]) {
+    if(idx == 10) return check(clock) == true ? 0 : INF;
+    
+    int ret = INF;
+    for(int cnt = 0; cnt<4; cnt++) {
+        ret = min(ret, cnt + solve(idx + 1, clock));
+        moveclock(idx, clock);
+    }
+    return ret;
+}
+
+
+int main() {
+    scanf("%d", &c);
+    
+    for(int i = 0; i<c; i++) {
+        for(int j = 0; j<16; j++) {
+            scanf("%d", &clock[j]);
+            clock[j] = clock[j]%12;
+        }
+        
+        int sol = solve(0, clock);
+        if(sol == INF)
+            printf("-1\n");
+        else
+            printf("%d\n", sol);
+    }
+
+    return 0;
+}
