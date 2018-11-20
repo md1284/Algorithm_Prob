@@ -44,10 +44,6 @@ int main() {
     ifstream inf("A-large-practice.in");
     ofstream outf("output.txt");
 	
-	long long int a = pow(2, 50);
-	cout << pow(2, 50) << endl;
-	cout << a << endl;
-	
 	//scanf("%d", &c);
 	inf >> c;
 	
