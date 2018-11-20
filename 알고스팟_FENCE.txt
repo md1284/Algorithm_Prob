@@ -1,0 +1,52 @@
+#include <iostream>
+
+using namespace std;
+
+int c, n;
+int fence[20001];
+
+int solve(int left, int right) {
+    if(left >= right)    return fence[left];
+    
+    int mid = (left+right)/2;
+    int ret = max(solve(left, mid), solve(mid+1, right));
+    int curleft = left;
+    int curright = right;
+    int height = 0;
+    
+    left = mid;
+    right = mid + 1;
+    height = min(fence[left], fence[right]);
+    ret = max(ret, height*2);
+        
+    while(left > curleft || right < curright) {
+        if(right < curright && (left == curleft || fence[left-1] < fence[right+1])) {
+            right++;
+            height = min(height, fence[right]);
+        }
+        else {
+            left--;
+            height = min(height, fence[left]);
+        }
+        ret = max(height * (right-left+1), ret);
+    }
+    
+    return ret;
+}
+
+
+
+int main() {
+    scanf("%d", &c);
+    
+    for(int i = 0; i<c; i++) {
+        scanf("%d", &n);
+        
+        for(int j = 0; j<n; j++) 
+            scanf("%d", &fence[j]);
+    
+        printf("%d\n", solve(0, n-1));
+    }
+    
+    return 0;
+}
