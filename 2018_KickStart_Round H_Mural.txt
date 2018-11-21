@@ -1,0 +1,51 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+
+using namespace std;
+
+int c, n;
+int mural[5000005];
+
+int solve(int cnt) {
+	int sum = 0;
+	int ans = 0;
+	int mid = cnt / 2;
+	
+	for(int i = 0; i < cnt; i++) {
+		sum += mural[i];
+		if(cnt%2==0 && i >= mid)
+			sum -= mural[i-mid];
+		if(cnt%2==1 && i > mid)
+			sum -= mural[i-mid-1];
+		ans = max(ans, sum);
+	}
+	return ans;
+}
+
+
+int main() {
+    ifstream inf("B-large-practice.in");
+    ofstream outf("output.txt");
+	
+	//scanf("%d", &c);
+	inf >> c;
+	
+    for(int i = 0; i<c; i++) {
+    	//scanf("%d", &n);
+    	inf >> n;
+    	
+    	string str;
+    	//cin >> str;
+    	inf >> str;
+    	for(int j = 0; j<str.size(); j++)
+    		mural[j] = str[j] - '0';
+    	
+		//cout << "Case #" << i+1 << ": " << solve(str.size()) << endl;
+		outf << "Case #" << i+1 << ": " << solve(str.size()) << endl;
+	}
+    
+    inf.close();
+    outf.close();
+    return 0;
+}
