@@ -1,0 +1,79 @@
+#include <iostream>
+#include <fstream>
+#include <math.h>
+
+using namespace std;
+
+typedef long long ULL;
+
+const int MOD = 1000000007;
+int c, n, m;
+int fac[200009];
+
+void prev(void) {
+	fac[0] = 1;
+	
+	for(int i = 1; i<200009; i++)
+		fac[i] = (ULL)fac[i-1] * i % MOD;
+	
+	return;
+}
+
+int power(int a, int b) {
+	int ret = 1;
+	for(; b > 0; b >>= 1, a = (ULL)a * a % MOD) {
+		if(b & 1)
+			ret = (ULL)ret * a % MOD;
+	}
+	return ret;
+}
+
+int inverse(int a) {
+	return power(a, MOD - 2);
+}
+
+int combination(int a, int b) {
+	int ret = fac[a];
+	ret = (ULL)ret * inverse(fac[a-b]) % MOD; 
+	ret = (ULL)ret * inverse(fac[b]) % MOD; 
+
+	return ret;
+}
+
+int solve(void) {
+	int sign = -1;
+	int ans = fac[2*n];
+	
+	for(int i = 1; i<=m; i++, sign = -sign) {
+		int ret = (ULL)fac[2*n-i] * power(2, i) % MOD;
+		ret = (ULL)ret * combination(m, i) % MOD;
+		ans += sign * ret;
+		if(ans < 0)
+			ans += MOD;
+		ans %= MOD;
+	}
+	
+	return ans;
+}
+
+int main() {
+    ifstream inf("C-small-practice.in");
+    ofstream outf("output.txt");
+	
+	//scanf("%d", &c);
+	inf >> c;
+	
+	prev();	
+    for(int i = 0; i<c; i++) {
+    	//scanf("%d %d", &n, &m);
+    	inf >> n >> m;
+    	
+    	
+		//cout << "Case #" << i+1 << ": " << solve() << endl;
+		outf << "Case #" << i+1 << ": " << solve() << endl;
+	}
+    
+    inf.close();
+    outf.close();
+    return 0;
+}
