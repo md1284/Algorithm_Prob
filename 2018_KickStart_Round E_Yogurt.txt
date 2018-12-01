@@ -1,0 +1,63 @@
+#include <iostream>
+#include <fstream>
+#include <string.h>
+#include <vector>
+#include <math.h>
+#include <algorithm>
+
+using namespace std;
+
+int t, n, k;
+
+
+int solve(const vector<int>& a) {
+	
+	int ret = 0;
+	int day = 0;
+	
+	for(int i = 0; i<n; i++) {
+		
+		if(a[i] > day)
+			ret++;
+		else
+			continue;
+		
+		if(ret%k == 0)
+			day++;
+	}
+	
+	return ret;
+}
+
+
+int main() {
+    ifstream inf("A-large-practice.in");
+    ofstream outf("output.txt");
+	
+	//cin >> t;
+	inf >> t;
+	
+	
+	
+    for(int i = 0; i<t; i++) {
+    	//cin >> n >> k;
+    	inf >> n >> k;
+    	
+    	vector<int> a(n, 0);
+    	for(int j = 0; j<n; j++) {
+    		//cin >> a[j];
+    		inf >> a[j];
+		}
+		
+		sort(a.begin(), a.end());
+		
+		//cout << "Case #" << i+1 << ": " << solve(a) << endl;
+		outf << "Case #" << i+1 << ": " << solve(a) << endl;
+		
+		
+	}
+    
+    inf.close();
+    outf.close();
+    return 0;
+}
