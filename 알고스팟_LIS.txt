@@ -1,0 +1,45 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <string.h>
+
+using namespace std;
+
+int c, n;
+vector<int> arr(501);
+int cache[501];
+
+int solve(int index) {
+	if(index == n)	return 0;
+
+	int& ret = cache[index+1];
+	if(ret != -1)	return ret;
+	
+	ret = 1;
+	for(int i = index+1; i<n; i++) {
+		if(index == -1 || arr[index] < arr[i])
+			ret = max(ret, solve(i) + 1);
+	}
+	
+	return ret;
+}
+
+int main() {
+	cin >> c;
+	
+	for(int i = 0; i<c; i++) {
+		cin >> n;
+		
+		memset(cache, -1, sizeof(cache));
+
+		for(int j = 0; j<n; j++)
+			cin >> arr[j];
+
+		cout << solve(-1) - 1 << endl;
+		arr.clear();
+	}
+	
+	
+	
+	return 0;
+}

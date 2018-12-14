@@ -1,0 +1,56 @@
+#include <iostream>
+#include <limits>
+#include <vector>
+#include <algorithm>
+#include <string.h>
+
+using namespace std;
+
+const long long NEGINF = numeric_limits<long long>::min();
+int c, n, m;
+vector<int> A(105), B(105);
+int cache[105][105];
+
+int solve(int index1, int index2) {
+	int& ret = cache[index1+1][index2+1];
+	if(ret != -1)	return ret;
+	
+	ret = 2;
+	long long a = (index1 == -1 ? NEGINF : A[index1]);
+	long long b = (index2 == -1 ? NEGINF : B[index2]);
+	long long maxElement = max(a, b);
+	
+	for(int pos1 = index1 + 1; pos1<n; pos1++) {
+		if(maxElement < A[pos1])
+			ret = max(ret, solve(pos1, index2) + 1);
+	}
+	for(int pos2 = index2 + 1; pos2<m; pos2++) {
+		if(maxElement < B[pos2])
+			ret = max(ret, solve(index1, pos2) + 1);
+	}
+	
+	return ret;
+}
+
+int main() {
+	cin >> c;
+	
+	for(int i = 0; i<c; i++) {
+		cin >> n >> m;
+		
+		memset(cache, -1, sizeof(cache));
+
+		for(int j = 0; j<n; j++)
+			cin >> A[j];
+		for(int j = 0; j<m; j++)
+			cin >> B[j];
+
+		cout << solve(-1, -1) - 2 << endl;
+		A.clear();
+		B.clear();
+	}
+	
+	
+	
+	return 0;
+}
