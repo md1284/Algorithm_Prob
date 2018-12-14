@@ -1,0 +1,78 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <string.h>
+
+using namespace std;
+
+const int INF = 987654321;
+int c, n;
+vector<int> pi;
+int cache[10001];
+
+int score(int index, int i) {	
+	bool check = true;
+	for(int j = 1; j<i; j++) {
+		if(pi[index + j] != pi[index + j-1])
+			check = false;
+	}
+	
+	if(check)	return 1;
+
+	check = true;
+	int term = pi[index + 1] - pi[index];
+
+	for(int j = 1; j<i; j++) {
+		if(term != pi[index + j] - pi[index + j - 1])
+			check = false;
+	}
+	
+	if(check && abs(term) == 1)	return 2;
+	else if(check)	return 5;
+	
+	check = true;
+	for(int j  = 0; j<i; j++) {
+		if(pi[index + j] != pi[index + j%2])
+			check = false;
+	}
+	
+	if(check)	return 4;
+	
+	return 10;
+}
+
+int solve(int index) {
+	if(index == n)	return 0;
+	
+	int& ret = cache[index];
+	if(ret != -1)	return ret;
+	
+	ret = INF;
+	
+	for(int i = 3; i<=5; i++) {
+		if(index + i > n)	continue;
+		ret = min(ret, solve(index + i) + score(index, i));
+	}
+	
+	return ret;
+}
+
+
+int main() {
+	cin >> c;
+	
+	for(int i = 0; i<c; i++) {		
+		string str;
+		cin >> str;
+		n = str.size();
+		memset(cache, -1, sizeof(cache));
+		
+		for(int j = 0; j<str.size(); j++) 
+			pi.push_back(str[j]-'0');
+		
+		cout << solve(0) << endl;
+		pi.clear();
+	}
+		
+	return 0;
+}

@@ -1,0 +1,68 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <string.h>
+
+using namespace std;
+
+const int INF = 987654321;
+int c, n, s;
+int sum[101], sqsum[101];
+int seq[101];
+int cache[101][11];
+
+void prev() {
+	sum[0] = seq[0];
+	sqsum[0] = seq[0] * seq[0];
+	
+	for(int i = 1; i<n; i++) {
+		sum[i] = sum[i-1] + seq[i];
+		sqsum[i] = sqsum[i-1] + seq[i] * seq[i];
+	}
+}
+
+int error(int a, int b) {
+	int subsum = sum[b] - (a == 0 ? 0 : sum[a-1]);
+	int subsqsum = sqsum[b] - (a == 0 ? 0 : sqsum[a-1]);
+	int m = int(0.5 + double(subsum) / (b - a + 1));
+	int ret = subsqsum - 2 * m * subsum + (b - a + 1) * m * m;
+	
+	return ret;
+}
+
+
+int solve(int index, int s) {
+	if(index == n)	return 0;
+	if(s == 0)	return INF;
+	
+	int& ret = cache[index][s];
+	if(ret != -1)	return ret;
+	
+	ret = INF;
+	
+	for(int i = index; i<n; i++)
+		ret = min(ret, error(index, i) + solve(i+1, s-1));
+	
+	return ret;
+}
+
+
+int main() {
+	cin >> c;
+	
+	for(int i = 0; i<c; i++) {		
+		cin >> n >> s;
+		memset(cache, -1, sizeof(cache));
+		memset(seq, 0, sizeof(seq));
+		
+		for(int j = 0; j<n; j++)
+			cin >> seq[j];
+	
+		sort(seq, seq + n);
+		prev();
+	
+		cout << solve(0, s) << endl;
+	}
+		
+	return 0;
+}
