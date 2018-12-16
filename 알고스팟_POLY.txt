@@ -1,0 +1,48 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <string.h>
+
+using namespace std;
+
+const int MOD = 10000000;
+int c, n;
+int cache[101][101];
+
+int solve(int index, int prev) {
+	if(index == 0)	return 1;
+	
+	int& ret = cache[index][prev];
+	if(ret != -1)	return ret;
+	
+	ret = 0;
+	
+	if(prev == 0) {
+		for(int i = 1; i<=index; i++)
+			ret += solve(index - i, i)%MOD;
+	}
+	else {
+		for(int i = 1; i<=index; i++) {
+			int cand = prev + i - 1;
+			cand = (cand * solve(index - i, i))%MOD;
+			
+			ret += cand;
+			ret %= MOD;
+		}
+	}
+	
+	return ret%MOD;
+}
+
+int main() {
+	cin >> c;
+	
+	for(int i = 0; i<c; i++) {		
+		cin >> n;
+		memset(cache, -1, sizeof(cache));
+		
+		cout << solve(n, 0) << endl;
+	}
+	
+	return 0;
+}

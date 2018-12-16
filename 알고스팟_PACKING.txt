@@ -1,0 +1,64 @@
+#include <iostream>
+#include <iomanip>
+#include <fstream>
+#include <algorithm>
+#include <string.h>
+#include <vector>
+
+using namespace std;
+
+int c, n, w;
+int weight[105], req[105];
+string name[105];
+int cache[1005][105];
+vector<string> sol;
+
+int solve(int vol, int index) {
+	if(index == n)	return 0;
+	
+	int& ret = cache[vol][index];
+	if(ret != -1)	return ret;
+	
+	ret = solve(vol, index + 1);
+	
+	if(vol + weight[index] <= w) {
+		ret = max(ret, solve(vol + weight[index], index + 1) + req[index]);
+	}
+	
+	return ret;
+}
+
+void reconstruct(int vol, int index, vector<string>& sol) {
+	if(index == n)	return;
+			
+	if(solve(vol, index) == solve(vol, index+1))	{
+		reconstruct(vol, index + 1, sol);
+	}
+	else {
+		sol.push_back(name[index]);
+		reconstruct(vol + weight[index], index + 1, sol);	
+	}
+}
+
+
+int main() {
+	cin >> c;
+	
+    for(int i = 0; i<c; i++) {
+    	cin >> n >> w;
+		memset(cache, -1, sizeof(cache));
+    	
+    	for(int j = 0; j<n; j++)
+    		cin >> name[j] >> weight[j] >> req[j];
+
+    	int sum = solve(0, 0);
+		reconstruct(0, 0, sol);
+		
+    	cout << sum << " " << sol.size() << endl;
+    	for(int j = 0; j<sol.size(); j++)
+    		cout << sol[j] << endl;
+    	sol.clear();
+	}
+    
+    return 0;
+}
