@@ -1,0 +1,94 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <limits>
+#include <string.h>
+
+using namespace std;
+
+const int MAX = numeric_limits<int>::max();
+int c, n, k;
+vector<int> arr(501);
+vector<int> sol;
+int cache[501];
+int cntcache[501];
+
+int solve(int index) {
+	if(index == n)	return 0;
+
+	int& ret = cache[index+1];
+	if(ret != -1)	return ret;
+	
+	ret = 1;
+	for(int i = index+1; i<n; i++) {
+		if(index == -1 || arr[index] < arr[i])
+			ret = max(ret, solve(i) + 1);
+	}
+	
+	return ret;
+}
+
+int count(int index) {
+	if(solve(index) == 1)	return 1;
+	
+	int& ret = cntcache[index + 1];
+	if(ret != -1)	return ret;
+	
+	ret = 0;
+	
+	for(int next = index + 1; next < n; next++) {
+		if((index == -1 || arr[index] < arr[next]) && solve(index) == solve(next) + 1)
+			ret = min<long long>(MAX, (long long)ret + count(next));
+	}
+	return ret;
+}
+
+void reconstruct(int start, int skip, vector<int>& sol) {
+	if(start != -1)	sol.push_back(arr[start]);
+	
+	vector<pair<int, int> > follow;
+	for(int next = start+1; next<n; next++) {
+		if((start == -1 || arr[start] < arr[next]) && solve(start) == solve(next) + 1)
+			follow.push_back(make_pair(arr[next], next));
+	}
+	sort(follow.begin(), follow.end());
+	
+	for(int i = 0; i<follow.size(); i++) {
+		int idx = follow[i].second;
+		int cnt = count(idx);
+		if(cnt < skip)
+			skip -= cnt;
+		else {
+			reconstruct(idx, skip, sol);
+			break;
+		}
+	}
+}
+
+int main() {
+	cin >> c;
+	
+	for(int i = 0; i<c; i++) {
+		cin >> n >> k;
+		memset(cache, -1, sizeof(cache));
+		memset(cntcache, -1, sizeof(cntcache));
+
+		for(int j = 0; j<n; j++)
+			cin >> arr[j];
+
+		cout << solve(-1) - 1 << endl;
+		int cnt = count(-1);
+		reconstruct(-1, k, sol);
+		
+		for(int j = 0; j<sol.size(); j++)
+			cout << sol[j] << " ";
+		printf("\n");
+		
+		arr.clear();
+		sol.clear();
+	}
+	
+	
+	
+	return 0;
+}
