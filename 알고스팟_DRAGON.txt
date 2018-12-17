@@ -1,0 +1,59 @@
+#include <iostream>
+#include <iomanip>
+#include <vector>
+#include <algorithm>
+#include <string.h>
+#include <assert.h>
+
+using namespace std;
+
+const int MAX = 1000000000+51;
+const string BASE = "FX";
+const string EXPEND_X = "X+YF";
+const string EXPEND_Y = "FX-Y";
+int c, n, p, l;
+int len[51];
+
+void calclen() {
+	len[0] = 1;
+	for(int i = 1; i<51; i++)
+		len[i] = min(MAX, len[i-1]*2 + 2);
+}
+
+char solve(int generation, int skip, const string& s) {
+	if(generation == 0)	return s[skip];
+	
+	for(int i = 0; i<s.size(); i++) {
+		if(s[i] == 'X' || s[i] == 'Y') {
+ 			if(skip >= len[generation])
+				skip -= len[generation];
+			else if(s[i] == 'X') {
+				return solve(generation-1, skip, EXPEND_X);
+			}
+			else
+				return solve(generation-1, skip, EXPEND_Y);
+		}
+		else if(skip > 0)
+			skip--;
+		else
+			return s[i];
+	}
+	
+	return '!';
+}
+
+
+int main() {
+	cin >> c;
+	
+	for(int i = 0; i<c; i++) {		
+		cin >> n >> p >> l;
+		calclen();
+		
+		for(int j = 0; j<l; j++) 
+			cout << solve(n, p+j-1, BASE);
+		printf("\n");
+	}
+	
+	return 0;
+}
