@@ -1,0 +1,102 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <math.h>
+
+using namespace std;
+
+int c;
+vector<string> board;
+int cache[19684];
+
+bool done(int y, int x) {
+	if(x + 2 < 3 && board[y][x] == board[y][x+1] && board[y][x] == board[y][x+2])	return true;
+	if(y + 2 < 3 && board[y][x] == board[y+1][x] && board[y][x] == board[y+2][x])	return true;
+	if(x + 2 < 3 && y + 2 < 3 && board[y][x] == board[y+1][x+1] && board[y][x] == board[y+2][x+2])	return true;
+	
+	return false;
+}
+
+bool isFinished(const vector<string>& board, char turn) {
+	for(int y = 0; y<3; y++) {
+		for(int x = 0; x<3; x++) {
+			if(board[y][x] == turn && done(y, x))	return true;
+		}
+	}
+	
+	return false;
+}
+
+int bijection(const vector<string>& board) {
+	int ret = 0;
+	
+	for(int y = 0; y<3; y++) {
+		for(int x = 0; x<3; x++) {
+			ret = ret * 3;
+			if(board[y][x] == 'o')	ret++;
+			else if(board[y][x] == 'x')	ret += 2; 
+		}
+	}
+	return ret;
+}
+
+
+int canWin(vector<string>& board, char turn) {	// return  turn lose : -1, turn win : 1, draw : 0 
+	if(isFinished(board, 'o' + 'x' - turn))	return -1;
+	
+	int& ret = cache[bijection(board)];
+	if(ret != -2)	return ret;
+	
+	
+	int minValue = 2;
+	for(int y = 0; y<3; y++) {
+		for(int x = 0; x<3; x++) {
+			if(board[y][x] == '.') {
+				board[y][x] = turn;
+				minValue = min(minValue, canWin(board, 'o' + 'x' - turn));
+				board[y][x] = '.';
+			}
+		}
+	}
+	
+	if(minValue == 2 || minValue == 0)	return ret = 0;
+	return ret = -minValue;
+}
+
+int main() {
+	ifstream inf("prob.txt");
+	inf >> c;
+	
+	for(int i = 0; i<c; i++) {
+		for(int j = 0; j<19684; j++)
+			cache[j] = -2;
+
+		for(int y = 0; y<3; y++) {
+			string str;
+			inf >> str;
+			board.push_back(str);
+		}
+		int cnto = 0, cntx = 0;
+		char turn;
+		for(int y = 0; y<3; y++) {
+			for(int x = 0; x<3; x++) {
+				if(board[y][x] == 'o')	cnto++;
+				if(board[y][x] == 'x')	cntx++;
+			}
+		}
+		
+		if(cnto >= cntx)	turn = 'x';
+		else	turn = 'o';
+		
+		int inspect = canWin(board, turn);
+		
+		if(inspect == 1)	cout << (char)turn << endl;
+		else if(inspect == -1)	cout << char('o' + 'x' - turn) << endl;
+		else	cout << "TIE" << endl;
+		
+		board.clear();
+	}
+	
+	
+	return 0;
+}

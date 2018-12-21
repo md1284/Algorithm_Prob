@@ -1,0 +1,115 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <string.h>
+
+using namespace std;
+
+int c;
+vector<string> board;
+vector<int> canmove;
+int cache[1<<26];
+int block_3[4][3][2] = {
+	{ {0, 0}, {1, 0}, {1, 1} },
+	{ {0, 0}, {1, 0}, {0, 1} },
+	{ {0, 0}, {0, 1}, {1, 1} },
+	{ {0, 1}, {1, 0}, {1, 1} }
+};
+int block_2[2][2][2] = {
+	{ {0, 0}, {0, 1} },
+	{ {0, 0}, {1, 0} }
+};
+
+void precalc() {	// calculate all case which we can put the block 
+	// case) block_3
+	for(int y = 0; y<4; y++) {
+		for(int x = 0; x<4; x++) {
+			for(int type = 0; type<4; type++) {
+				int state = 0;
+				for(int i = 0; i<3; i++) {
+					int dx = x + block_3[type][i][1];
+					int dy = y + block_3[type][i][0];
+					state = state | (1<<(dy*5 + dx));
+				}
+				canmove.push_back(state);
+			}
+		}
+	}
+	//case) block_2
+	for(int y = 0; y<5; y++) {
+		for(int x = 0; x<5; x++) {
+			for(int type = 0; type<2; type++) {
+				int state = 0;
+				
+				int dx2 = x + block_2[type][1][1];
+				int dy2 = y + block_2[type][1][0];
+				
+				if(4 < dx2 || 4 < dy2)	continue;
+				
+				for(int i = 0; i<2; i++) {
+					int dx = x + block_2[type][i][1];
+					int dy = y + block_2[type][i][0];
+					if(4 < dx || 4 < dy)	continue;
+					
+					state = state | (1<<(dy*5 + dx));
+				}
+				canmove.push_back(state);
+			}
+		}
+	}
+}
+
+
+int bijection(vector<string> board) {
+	int ret = 0;
+	for(int y = 0; y<5; y++) {
+		for(int x = 0; x<5; x++) {
+			if(board[y][x] == '.')	continue;
+			ret = ret | (1<<(y*5 + x));
+		}
+	}
+	return ret;
+}
+
+int solve(int biboard)	{	// player can win in this turn
+	int& ret = cache[biboard];
+	if(ret != -1)	return ret;
+	
+	ret = 0;
+	for(int i = 0; i<canmove.size(); i++) {
+		if((canmove[i] & biboard) == 0) {
+			if(!solve(biboard | canmove[i])) {
+				ret = 1;
+				break;
+			}
+		}
+	}
+	return ret;
+}
+
+int main() {
+	ifstream inf("prob.txt");
+	inf >> c;
+	//cin >> c;
+	
+	precalc();
+	
+	for(int i = 0; i<c; i++) {
+		memset(cache, -1, sizeof(cache));
+			
+		for(int j = 0; j<5; j++) {
+			string str;
+			inf >> str;
+			//cin >> str;
+			board.push_back(str);
+		}
+		
+		if(solve(bijection(board)))	cout << "WINNING" << endl;
+		else	cout << "LOSING" << endl;
+		
+		board.clear();
+	}
+	
+	
+	return 0;
+}
