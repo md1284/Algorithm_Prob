@@ -1,39 +1,45 @@
-import java.util.*;
+#include <iostream>
+#include <vector>
+#include <string.h>
+#include <algorithm>
 
-public class Main {	
-	public static void main(String[] args) {
-		Scanner sc = new Scanner(System.in);
+using namespace std;
+
+int n;
+int pos[26];
+vector<string> s;
+
+int solve() {
+	int cnt = 0;
+	
+	for(int i = 0; i<s.size(); i++) {
+		pos[s[i][0]-'a'] = 1;
 		
-		int n = sc.nextInt();
-		int count = 0;
-		
-		for(int i=0; i<n; i++) {
-			String s = sc.next();
-			char[] c = new char[101];
-			int ins = 0;
-			
-			for(int j=0; j<s.length(); j++) {
-				if(j == 0) {	
-					c[j] = s.charAt(j);
-					continue;
-				} else if(c[j-1] == s.charAt(j)) {
-					c[j] = s.charAt(j);
-				} else if(c[j-1] != s.charAt(j)) {
-					for(int k=0; k<j-1; k++) {
-						if(c[k] == s.charAt(j)) {
-							ins = 1;
-							break;
-						}
-					}
-					c[j] = s.charAt(j);
-				}
+		bool check = true;
+		for(int j = 1; j<s[i].size(); j++) {
+			if(pos[s[i][j]-'a'] == 0 && s[i][j] != s[i][j-1])	pos[s[i][j]-'a'] = 1;
+			else if(pos[s[i][j]-'a'] == 1 && s[i][j] != s[i][j-1]) {
+				check = false;
+				continue;
 			}
-			
-			if(ins == 0)
-				count++;
 		}
-		
-		System.out.println(count);
+		memset(pos, 0, sizeof(pos));
+		if(check)	cnt++;
 	}
+	
+	return cnt;
 }
 
+int main() {
+	cin >> n;
+	
+	for(int i = 0; i<n; i++) {
+		string str;
+		cin >> str;
+		s.push_back(str);
+	}
+	
+	cout << solve() << endl;
+		
+	return 0;
+}
