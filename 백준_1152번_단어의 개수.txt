@@ -1,18 +1,21 @@
-import java.util.*;
+#include <iostream>
 
-public class Main {	
-	public static void main(String[] args) {
-		Scanner sc = new Scanner(System.in);
-		
-		String s = sc.nextLine();
-		String[] a = s.split(" ");
-		int count = a.length;
-		
-		for(int i=0; i<a.length; i++) {
-			if(a[i].trim().length() == 0)
-				count--;
-		}
-		System.out.println(count);
+using namespace std;
+
+
+int main() {
+	string s;
+	getline(cin, s);
+	
+	int cnt = 0;
+	for(int i = 1; i<s.size(); i++) {
+		if(i < s.size()-1 && s[i] == ' ')
+			cnt++;
 	}
+	
+	if(s[0] == ' ' && s.size() == 1)
+		cout << 0 << endl;
+	else cout << cnt+1 << endl;
+	
+	return 0;
 }
-
