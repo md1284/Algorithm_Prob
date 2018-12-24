@@ -1,75 +1,45 @@
-#include <stdio.h>
-#include <windows.h>
+#include <iostream>
+#include <vector>
+#include <algorithm>
 
-int arr[10000];
-int t=0;
+using namespace std;
 
-
-void push(void)
-{
+int main() {
 	int n;
-
-	scanf_s("%d", &n);
-
-	arr[++t] = n;
-}
-
-void pop(void)
-{
-	if (t <= 0)
-		printf("-1\n");
-
-	else
-	{
-		printf("%d\n", arr[t]);
-		t--;
-	}
-}
-
-void top(void)
-{
-	if (t <= 0)
-		printf("-1\n");
-
-	else
-	{
-		printf("%d\n", arr[t]);
-	}
-}
-
-int main(void)
-{
-	int num, i;
-	char idx[10];
-
-	scanf_s("%d", &num);
-
-	for(i = 0; i < num; i++)
-	{
-		scanf_s("%s", &idx, sizeof(idx));
-
-		if ((idx[0] == 'p') && (idx[1] == 'u'))
-			push(idx[5]);
-
-		if ((idx[0] == 'p') && (idx[1] == 'o'))
-			pop();
-
-		if (idx[0] == 's')
-			printf("%d\n", t);
-
-		if (idx[0] == 'e')
-		{
-			if (t == 0)
-				printf("1\n");
-
-			else
-				printf("0\n");
-		}
-
-		if (idx[0] == 't')
-			top();
-	}
+	vector<int> st;
+	cin >> n;
 	
-	system("pause");
+	for(int i = 0; i<n; i++) {
+		string s;
+		cin >> s;
+		
+		if(s == "push") {
+			int a;
+			cin >> a;
+			st.push_back(a);
+		}
+		else if(s == "pop") {
+			if(!st.empty()) {
+				cout << st[st.size()-1] << endl;
+				st.pop_back();
+			}
+			else	cout << -1 << endl;
+		}
+		else if(s == "size")
+			cout << st.size() << endl;
+		else if(s == "empty") {
+			if(st.empty())
+				cout << 1 << endl;
+			else
+				cout << 0 << endl;
+		}
+		else if(s == "top") {
+			if(!st.empty())	cout << st[st.size()-1] << endl;
+			else	cout << -1 << endl;
+		}
+	}
+		
 	return 0;
 }
+
+

@@ -1,33 +1,33 @@
-import java.util.*;
+#include <iostream>
+#include <vector>
 
-public class Main {	
-	public static void main(String[] args) {
-		Scanner sc = new Scanner(System.in);
-		
-		StringBuilder s = new StringBuilder();
-		String a = sc.nextLine();
-		int count = a.length();
-		
-		for(int i=0; i<a.length(); i++) {
-			if(a.charAt(i) == '=') {
-				if(a.charAt(i-1) == 'c')
-					count--;
-				else if(a.charAt(i-1) == 'z' && a.charAt(i-2) == 'd')
-					count -= 2;
-				else if(a.charAt(i-1) == 's' || a.charAt(i-1) == 'z')
-					count--;			
-			} else if(a.charAt(i) == '-') {
-				if(a.charAt(i-1) == 'c')
-					count--;
-				else if(a.charAt(i-1) == 'd') {
-					count--;
-				}
-			} else if(a.charAt(i) == 'j') {
-				if(a.charAt(i-1) == 'l' || a.charAt(i-1) == 'n')
-					count--;
-			}			
+using namespace std;
+
+int main() {
+	string s;
+	cin >> s;
+	
+	int idx = 0, cnt = 0;
+	for(int i = 0; i<s.size(); i+=idx) {
+		string sb = s.substr(i, 3);
+		if(sb == "dz=") {
+			idx = 3;
+			cnt++;
+			continue;
 		}
-		
-		System.out.println(count);
+		sb = s.substr(i, 2);
+		if(sb == "c=" || sb == "c-" || sb == "d-" || sb == "lj" || sb == "nj" || sb == "s=" || sb == "z=") {
+			idx = 2;
+			cnt++;
+			continue;
+		}
+		else {
+			idx = 1;
+			cnt++;
+		}
 	}
+	
+	cout << cnt << endl;
+	
+	return 0;
 }
