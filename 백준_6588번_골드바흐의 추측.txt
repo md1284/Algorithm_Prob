@@ -33,21 +33,25 @@ void eratosthenes() {
 }
 
 int main() {
-	n = 1001;
-	int num;
-	cin >> num;
-	vector<int> s(num);
-	
-	for(int i = 0; i<num; i++)
-		cin >> s[i];
-	
-	int cnt = 0;
+	n = 1000001;
 	eratosthenes();
-	for(int i = 0; i<num; i++)
-		if(isPrime(s[i]))	cnt++;
 
-	cout << cnt << endl;
-	
+	int N;
+	cin >> N;
+	while(N != 0) {
+		int a, b;
+		
+		for(int i = 3; i<=N/2; i+=2) {
+			if(isPrime(i) && isPrime(N-i)) {
+				a = i;
+				b = N-i;
+				break;
+			}
+		}
+
+		printf("%d = %d + %d\n", N, a, b);
+		scanf("%d", &N);
+	}
 	
 	return 0;
 }

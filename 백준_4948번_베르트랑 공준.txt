@@ -1,60 +1,51 @@
-import java.util.*;
+#include <iostream>
+#include <vector>
+#include <string.h>
+#include <math.h>
 
-public class Main {
+using namespace std;
+
+const int MAX_N = 1000000000;
+int n;
+
+unsigned char sieve[(MAX_N + 7) / 8];
+
+inline bool isPrime(int k) {
+	return sieve[k>>3] & (1<<(k&7));
+}
+
+inline void setComposite(int k) {
+	sieve[k>>3] &= ~(1<<(k&7));
+}
+
+void eratosthenes() {
+	memset(sieve, 255, sizeof(sieve));
+	setComposite(0);
+	setComposite(1);
 	
-	boolean isPrime(int n) {
-		if(n == 1)
-			return false;
-		
-		for(int i=2; i*i<=n; i++) {
-			if(n%i == 0)
-				return false;
-		}
-		return true;		
-	}
-	
-	int countPrime(int n) {
-		boolean[] a = new boolean[246913];
-		int count = 0;
-		
-		for(int i=n+1; i<=2*n; i++)
-			a[i] = true;
-		
-		for(int i=n+1; i<=2*n; i++) {
-			if(a[i] == false)
-				continue;
-			
-			if(i == 1) {
-				a[i] = false;
-				continue;
-			}
-			
-			if(!isPrime(i)) {
-				for(int j=i; j<=2*n; j+=i)
-					a[j] = false;
-			}
-		}
-		
-		for(int i=n+1; i<=2*n; i++) {
-			if(a[i] == true)
-				count++;
-		}
-		
-		return count;
-	}
-	
-	public static void main(String[] args) {
-		Scanner sc = new Scanner(System.in);
-		int n = 1;
-		Main q = new Main();
-		
-		while(true) {
-			n = sc.nextInt();
-			
-			if(n == 0)
-				break;
-			
-			System.out.println(q.countPrime(n));
+	int sqrtn = int(sqrt(n));
+	for(int i = 2; i<=sqrtn; i++) {
+		if(isPrime(i)) {
+			for(int j = i*i; j<=n; j+=i)
+				setComposite(j);
 		}
 	}
+}
+
+int main() {
+	n = 1000001;
+	eratosthenes();
+
+	int N;
+	cin >> N;
+	while(N != 0) {
+		int cnt = 0;
+		for(int i = N+1; i<=2*N; i++)
+			if(isPrime(i))	cnt++;
+			
+		printf("%d\n", cnt);
+		scanf("%d", &N);
+	}
+	
+	return 0;
 }

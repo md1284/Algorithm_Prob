@@ -1,58 +1,57 @@
-import java.util.*;
+#include <iostream>
+#include <vector>
+#include <string.h>
+#include <math.h>
 
-public class Main {
+using namespace std;
+
+const int MAX_N = 1000000000;
+int n;
+
+unsigned char sieve[(MAX_N + 7) / 8];
+
+inline bool isPrime(int k) {
+	return sieve[k>>3] & (1<<(k&7));
+}
+
+inline void setComposite(int k) {
+	sieve[k>>3] &= ~(1<<(k&7));
+}
+
+void eratosthenes() {
+	memset(sieve, 255, sizeof(sieve));
+	setComposite(0);
+	setComposite(1);
 	
-	boolean isPrime(int n) {
-		if(n == 1)
-			return false;
-		
-		for(int i=2; i*i<=n; i++) {
-			if(n%i == 0)
-				return false;
+	int sqrtn = int(sqrt(n));
+	for(int i = 2; i<=sqrtn; i++) {
+		if(isPrime(i)) {
+			for(int j = i*i; j<=n; j+=i)
+				setComposite(j);
 		}
-		return true;		
 	}
+}
 
-	public static void main(String[] args) {
-		Scanner sc = new Scanner(System.in);
-		int n = sc.nextInt();
-		int m;
-		Stack s = new Stack();
-		Main q = new Main();
+int main() {
+	n = 10001;
+	eratosthenes();
+
+	int t;
+	cin >> t;
+	
+	for(int i = 0; i<t; i++) {
+		int N, a, b;
+		scanf("%d", &N);
 		
-		boolean[] a = new boolean[100001];
-		
-		for(int i=1; i<100001; i++)
-			a[i] = true;
-		
-		for(int i=1; i<100001; i++) {
-			if(a[i] == false)
-				continue;
-			
-			if(i == 1) {
-				a[i] = false;
-				continue;
-			}
-			
-			if(!q.isPrime(i)) {
-				for(int j=i; j<=100000; j+=i)
-					a[i] = false;
+		for(int i=2; i<=N/2; i++) {
+			if(isPrime(i) && isPrime(N-i)) {
+				a = i;
+				b = N-i;
 			}
 		}
-		
-		for(int i=0; i<n; i++) {
-			m = sc.nextInt();
-			
-			for(int j=2; j<=m/2; j++) {
-				if(a[j] == false)
-					continue;
-				
-				if(a[m-j] == true)
-					s.push(j);				
-			}
-			
-			int x = m-(int)s.peek();
-			System.out.println(s.peek() + " " + x);
-		}
+		printf("%d %d\n", a, b);
 	}
+	
+	
+	return 0;
 }
