@@ -44,17 +44,13 @@ bool isConnected(int a, int b) {
 }
 
 int main() {
-	ifstream inf("prob.txt");
-	//cin >> n;
-	inf >> t;
+	cin >> t;
 	
 	for(int i = 0; i<t; i++) {
-		//cin >> n;
-		inf >> n;
+		cin >> n;
 		for(int j = 0; j<n; j++) {
 			int x, y, r;
-			//cin >> x >> y >> r;
-			inf >> x >> y >> r;
+			cin >> x >> y >> r;
 			
 			base[j][0] = x;
 			base[j][1] = y;
@@ -82,5 +78,3 @@ int main() {
 	
 	return 0;
 }
-
-
