@@ -2,98 +2,63 @@
 #include <vector>
 #include <queue>
 #include <algorithm>
-#include <Windows.h>
+#include <string.h>
 
 using namespace std;
 
+int n, m, v;
 vector<int> G[1001];
-queue<int> q;
-int visit[1001];
+bool visit[1001];
 
-void DFS(int start)
-{
-	visit[start] = 1;
-	printf("%d ", start);
-
-	for (int i = 0; i < G[start].size(); i++)
-	{
-		if (visit[G[start][i]] == 0)
-		{
-			visit[G[start][i]] = 1;
-			DFS(G[start][i]);
-		}
+void dfs(int start) {
+	visit[start] = true;
+	cout << start << " ";
+	
+	for(int i = 0; i<G[start].size(); i++) {
+		if(visit[G[start][i]])	continue;
+		
+		dfs(G[start][i]);
 	}
 }
 
-void BFS(int start)
-{
+void bfs(int start) {
+	queue<int> q;
 	q.push(start);
-	visit[start] = 1;
-	printf("%d ", start);
-
-	while (!q.empty())
-	{
-		int cur = q.front();
-
-		for (int i = 0; i < G[cur].size(); i++)
-		{
-			if (visit[G[cur][i]] == 0)
-			{
-				visit[G[cur][i]] = 1;
-				printf("%d ", G[cur][i]);
-				q.push(G[cur][i]);
-			}
-		}
-
+	
+	while(!q.empty()) {
+		int here = q.front();
 		q.pop();
-	}
-}
+		
+		if(visit[here])	continue;
+		
+		visit[here] = true;
+		cout << here << " ";
+		
+		for(int i = 0; i<G[here].size(); i++) {
+			if(visit[G[here][i]])	continue;
 
-void GSort(int n)
-{
-	for (int i = 1; i <= n; i++)
-	{
-		for (int j = 0; j < G[i].size(); j++)
-		{
-			for (int z = 0; z < j; z++)
-			{
-				if (G[i][j] < G[i][z])
-				{
-					int temp = G[i][j];
-					G[i][j] = G[i][z];
-					G[i][z] = temp;
-				}
-			}
+			q.push(G[here][i]);
 		}
 	}
 }
 
 
-int main(void)
-{
+int main() {
+	cin >> n >> m >> v;
 	
-	int n, m, start;
-	scanf("%d %d %d", &n, &m, &start);
-
-	for (int i = 0; i < m; i++)
-	{
-		int s, t;
-		scanf("%d %d", &s, &t);
-
-		G[s].push_back(t);
-		G[t].push_back(s);
+	for(int i = 0; i<m; i++) {
+		int a, b;
+		cin >> a >> b;
+		G[a].push_back(b);
+		G[b].push_back(a);
 	}
+	for(int i = 1; i<=n; i++)
+		sort(G[i].begin(), G[i].end());
 	
-	GSort(n);
-
-	DFS(start);
+	dfs(v);
+	memset(visit, false, sizeof(visit));
 	printf("\n");
-
-	for (int i = 1; i <= n; i++)
-		visit[i] = 0;
+	bfs(v);
 	
-	BFS(start);
-
-	system("pause");
 	return 0;
 }

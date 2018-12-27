@@ -1,84 +1,46 @@
-#include <stdio.h>
-#include <windows.h>
+#include <iostream>
+#include <queue>
 
-int arr[10000];
-int t = 0, r = 1;
+using namespace std;
 
-void push(int n)
-{
-	arr[++t] = n;
-}
-
-void pop(void)
-{
-	if (r > t)
-		printf("-1\n");
-
-	else
-	{
-		printf("%d\n", arr[r]);
-		r++;
-	}
-}
-
-void front(void)
-{
-	if (r > t)
-		printf("-1\n");
-
-	else
-		printf("%d\n", arr[r]);
-}
-
-void back(void)
-{
-	if (r > t)
-		printf("-1\n");
-
-	else
-		printf("%d\n", arr[t]);
-}
-
-int main(void)
-{
-	int n, i;
-	int num;
-	char idx[6];
-
-	scanf_s("%d", &n);
-
-	for (i = 0; i < n; i++)
-	{
-		scanf_s("%s", &idx, sizeof(idx));
-
-		if ((idx[0] == 'p') && (idx[1] == 'u'))
-		{
-			scanf_s("%d", &num);
-			push(num);
+int main() {
+	int n;
+	cin >> n;
+	
+	queue<int> q;
+	
+	for(int i = 0; i<n; i++) {
+		string str;
+		cin >> str;
+		
+		if(str == "push") {
+			int a;
+			cin >> a;
+			q.push(a);
+		}
+		else if(str == "pop") {
+			if(q.empty())	cout << -1 << endl;
+			else {
+				cout << q.front() << endl;
+				q.pop();
+			}
+		}
+		else if(str == "size")
+			cout << q.size() << endl;
+		else if(str == "empty") {
+			if(q.empty())	cout << 1 << endl;
+			else	cout << 0 << endl;
+		}
+		else if(str == "front") {
+			if(q.empty())	cout << -1 << endl;
+			else	cout << q.front() << endl;
+		}
+		else if(str == "back") {
+			if(q.empty())	cout << -1 << endl;
+			else	cout << q.back() << endl;
 		}
 		
-		if ((idx[0] == 'p') && (idx[1] == 'o'))
-			pop();
-
-		if (idx[0] == 's')
-			printf("%d\n", t - r+1);
-
-		if (idx[0] == 'e')
-		{
-			if ((t-r+1) == 0)
-				printf("1\n");
-
-			else
-				printf("0\n");
-		}
-
-		if (idx[0] == 'f')
-			front();
-
-		if (idx[0] == 'b')
-			back();
 	}
-
-	system("pause");
+	
 	return 0;
 }
