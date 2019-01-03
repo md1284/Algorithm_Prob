@@ -1,0 +1,45 @@
+#include <iostream>
+
+using namespace std;
+
+typedef long long LL;
+
+const int mod = 1000000007;
+int fac[4000001];
+
+void prev() {
+	fac[0] = 1;
+	for(int i = 1; i<4000001; i++)
+		fac[i] = (LL)fac[i-1] * i % mod;
+}
+
+int power(int a, int n) {
+	int ret = 1;
+	for(; n>0; n = n>>1, a = (LL)a * a % mod)
+		if(n & 1)
+			ret = (LL)ret * a % mod;
+	
+	return ret;
+}
+
+int inverse(int a) {
+	return power(a, mod - 2);
+}
+
+int combination(int n, int k) {
+	int ret = fac[n];
+	ret = (LL)ret * inverse(fac[n-k]) % mod;
+	ret = (LL)ret * inverse(fac[k]) % mod;
+	
+	return ret % mod;
+}
+
+int main() {
+	int n, k;
+	cin >> n >> k;
+	prev();
+	
+	cout << combination(n, k) << endl;
+	
+	return 0;
+}
