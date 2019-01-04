@@ -1,0 +1,68 @@
+#include <iostream>
+#include <vector>
+#include <string.h>
+
+using namespace std;
+
+const int INF = 987654321;
+int c, n, k, m, l;
+vector<int> preCourse[13];	// preCourse[i]: i's preCourse
+vector<int> Course[11];	// Course[i]: courses in i term
+int cache[11][1<<12];
+
+// solve(int term, int cur) // 현재 term 학기이고 들은 과목들이 cur일 때 다녀야할 최소학기
+// base case)
+// cur == k	return term;
+// term == m	return INF;
+
+int solve(int term, int cur) {
+	if(cur == k)	return term;
+	if(term == m)	return INF;
+	
+	int& ret = cache[term][cur];
+	if(ret != -1)	return ret;
+	
+	ret = 0;
+	
+	for(int i = 0; i<n; i++) {
+		if()
+	}
+}
+
+
+int main() {
+	cin >> c;
+	
+	for(int i = 0; i<c; i++) {
+		cin >> n >> k >> m >> l;
+		memset(cache, -1, sizeof(cache));
+		
+		for(int j = 0; j<n; j++) {
+			int r;
+			cin >> r;
+			
+			for(int k = 0; k<r; k++) {
+				int pre;
+				cin >> pre;
+				
+				preCourse[j].push_back(pre);
+			}
+		}
+		
+		for(int j = 0; j<m; j++) {
+			int r;
+			cin >> r;
+			
+			for(int k = 0; k<r; k++) {
+				int cour;
+				cin >> cour;
+				
+				Course[j].push_back(cour);
+			}
+		}
+		
+	}
+	
+	
+	return 0;
+}
