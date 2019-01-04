@@ -6,27 +6,33 @@ using namespace std;
 
 const int INF = 987654321;
 int c, n, k, m, l;
-vector<int> preCourse[13];	// preCourse[i]: i's preCourse
-vector<int> Course[11];	// Course[i]: courses in i term
+int preCourse[13];	// preCourse[i]: i's preCourse
+int Course[11];	// Course[i]: courses in i term
 int cache[11][1<<12];
 
-// solve(int term, int cur) // 현재 term 학기이고 들은 과목들이 cur일 때 다녀야할 최소학기
-// base case)
-// cur == k	return term;
-// term == m	return INF;
-
 int solve(int term, int cur) {
-	if(cur == k)	return term;
+	if(__builtin_popcount(cur) >= k)	return 0;
 	if(term == m)	return INF;
 	
 	int& ret = cache[term][cur];
 	if(ret != -1)	return ret;
+	ret = INF;
 	
-	ret = 0;
+	int canTake = (Course[term] & ~cur);
 	
 	for(int i = 0; i<n; i++) {
-		if()
+		if((canTake & (1<<i)) && (cur & preCourse[i]) != preCourse[i])
+			canTake &= ~(1<<i);
 	}
+	
+	for(int take = canTake; take>0; take = ((take - 1) & canTake)) {
+		if(__builtin_popcount(take) > l)	continue;
+		ret = min(ret, solve(term+1, cur | take) + 1);
+	}
+	
+	ret = min(ret, solve(term+1, cur));
+	
+	return ret;
 }
 
 
@@ -45,7 +51,7 @@ int main() {
 				int pre;
 				cin >> pre;
 				
-				preCourse[j].push_back(pre);
+				preCourse[j] = preCourse[j] | (1<<pre);
 			}
 		}
 		
@@ -57,10 +63,15 @@ int main() {
 				int cour;
 				cin >> cour;
 				
-				Course[j].push_back(cour);
+				Course[j] = Course[j] | (1<<cour);
 			}
 		}
 		
+		int ret = solve(0, 0);
+		if(ret == INF)	cout << "IMPOSSIBLE" << endl;
+		else 	cout << ret << endl;
+		memset(preCourse, 0, sizeof(preCourse));
+		memset(Course, 0, sizeof(Course));
 	}
 	
 	
