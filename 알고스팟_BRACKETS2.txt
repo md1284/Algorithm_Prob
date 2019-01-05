@@ -1,0 +1,66 @@
+#include <iostream>
+#include <stack>
+
+using namespace std;
+
+string solve(stack<char> st) {
+	stack<char> qt;
+	while(!st.empty()) {
+		if(st.top() == ')') {
+			qt.push(')');
+			st.pop();
+		}
+		else if(st.top() == '}') {
+			qt.push('}');
+			st.pop();
+		}
+		else if(st.top() == ']') {
+			qt.push(']');
+			st.pop();
+		}
+		else if(st.top() == '(') {
+			if(!qt.empty() && qt.top() == ')') {
+				qt.pop();
+				st.pop();
+			}
+			else
+				return "NO";
+		}
+		else if(st.top() == '{') {
+			if(!qt.empty() && qt.top() == '}') {
+				qt.pop();
+				st.pop();
+			}
+			else
+				return "NO";
+		}
+		else if(st.top() == '[') {
+			if(!qt.empty() && qt.top() == ']') {
+				qt.pop();
+				st.pop();
+			}
+			else
+				return "NO";
+		}
+	}
+	if(!qt.empty())	return "NO";
+	return "YES";
+}
+
+int main() {
+	int n;
+	cin >> n;
+	
+	for(int i = 0; i<n; i++) {
+		stack<char> st;
+		string str;
+		cin >> str;
+		
+		for(int j = 0; j<str.size(); j++)
+			st.push(str[j]);
+		
+		cout << solve(st) << endl;
+	}
+	
+	return 0;
+}

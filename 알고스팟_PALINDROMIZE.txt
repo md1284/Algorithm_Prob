@@ -1,0 +1,70 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+int c;
+
+vector<int> getPartialMatch(const string& rs) {
+	int n = rs.size();
+	vector<int> pi(n, 0);
+	int begin = 1, matched = 0;
+	
+	while(begin + matched < n) {
+		if(rs[begin + matched] == rs[matched]) {
+			matched++;
+			pi[begin + matched - 1] = matched;
+		}
+		else {
+			if(matched == 0)
+				begin++;
+			else {
+				begin += matched - pi[matched - 1];
+				matched = pi[matched - 1];
+			}
+		}
+	}
+	return pi;
+}
+
+
+int solve(const string& s) {
+	string rs(s);
+	reverse(rs.begin(), rs.end());
+	int n = s.size(), m = rs.size();
+	
+	vector<int> pi = getPartialMatch(rs);
+	int begin = 0, matched = 0;
+	
+	while(begin < n) {
+		if(matched < m && s[begin + matched] == rs[matched]) {
+			matched++;
+			
+			if(begin + matched == n)
+				return matched;
+		}
+		else {
+			if(matched == 0)
+				begin++;
+			else {
+				begin += matched - pi[matched - 1];
+				matched = pi[matched - 1];
+			}
+		}
+	}
+	return 0;
+}
+
+int main() {
+	cin >> c;
+	
+	for(int i = 0; i<c; i++) {
+		string s;
+		cin >> s;
+		
+		cout << s.size()*2 - solve(s) << endl;
+	}
+	
+	return 0;
+}
