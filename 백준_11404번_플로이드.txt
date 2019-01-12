@@ -1,68 +1,43 @@
-#include <stdio.h>
-#include <vector>
-#include <windows.h>
+#include <iostream>
+#include <string.h>
 
 using namespace std;
 
-vector<pair<int, int>> G[101];
-int dist[101], visit[101];
-int n, m, INF = 200000000;
+const int INF = 987654321;
+int n, m;
+int adj[101][101];
 
-int Dijk(int s, int e) {
-	dist[s] = 0;
-	int min, idx;
-
-	for (int i = 1; i <= n; i++) {
-		min = INF;
-
-		for (int j = 1; j <= n; j++) {
-			if (visit[j] == 0 && min > dist[j]) {
-				min = dist[j];
-				idx = j;
-			}
-		}
-
-		visit[idx] = 1;
-
-		for (int j = 0; j < G[idx].size(); j++) {
-			if (dist[G[idx][j].first] > dist[idx] + G[idx][j].second) {
-				dist[G[idx][j].first] = dist[idx] + G[idx][j].second;
-			}
-		}
-	}
-
-	if (dist[e] == INF)
-		return 0;
-	else
-		return dist[e];
+void floyd() {			
+	for(int i = 1; i<=n; i++)	adj[i][i] = 0;
+	
+	for(int k = 1; k<=n; k++)
+		for(int i = 1; i<=n; i++)
+			for(int j = 1; j<=n; j++)
+				adj[i][j] = min(adj[i][j], adj[i][k] + adj[k][j]);
 }
 
-int main(void) {
-	scanf("%d %d", &n, &m);
-
-	for (int i = 0; i < m; i++) {
+int main() {
+	cin >> n >> m;
+	
+	for(int i = 1; i<=n; i++)
+		for(int j = 1; j<=n; j++)
+			adj[i][j] = INF;
+	
+	for(int i = 0; i<m; i++) {
 		int a, b, c;
-		scanf("%d %d %d", &a, &b, &c);
-
-		G[a].push_back(make_pair(b, c));
+		cin >> a >> b >> c;
+		adj[a][b] = min(c, adj[a][b]);
 	}
 	
-	for (int i = 1; i <= n; i++) {
-		for (int j = 1; j <= n; j++) {
-			if (i == j) {
-				printf("0 ");
-				continue;
-			}
-
-			for (int k = 1; k <= n; k++) {
-				dist[k] = INF;
-				visit[k] = 0;
-			}
-			printf("%d ", Dijk(i, j));
+	floyd();
+	
+	for(int i = 1; i<=n; i++) {
+		for(int j = 1; j<=n; j++) {
+			if(adj[i][j] == INF)	cout << 0 << " ";
+			else	cout << adj[i][j] << " ";
 		}
 		printf("\n");
 	}
-
-	system("pause");
+	
 	return 0;
 }

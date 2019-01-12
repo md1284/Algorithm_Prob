@@ -1,64 +1,46 @@
-#include <stdio.h>
+#include <iostream>
+#include <string.h>
 
 using namespace std;
 
-int G[101][101];
-int D[101][101];
-int visit[101];
-int num, f;
-int di, dj;
+int n;
+int map[101][101];
+bool visit[101];
 
-void DFS(int n) {
-	if (n == dj && f != 0) {
-		D[di][dj] = 1;
-		return;
-	}
 
-	if (visit[n] == 1)
-		return;
-	else if (f != 0)
-		visit[n] = 1;
-
-	f = 1;
-
-	for (int i = 1; i <= num; i++) {
-		if (G[n][i] == 0)
-			continue;
-		if (D[di][dj] == 1)
-			return;
-
-		DFS(i);
+void dfs(int start, bool first) {
+	if(first != true)
+		visit[start] = true;
+	
+	for(int i = 0; i<n; i++) {
+		if(visit[i] || map[start][i] == 0) continue;
+		
+		dfs(i, false);
 	}
 }
 
-
-int main(void) {
-	scanf("%d", &num);
-
-	for (int i = 1; i <= num; i++) {
-		for (int j = 1; j <= num; j++) {
-			scanf("%d", &G[i][j]);
+int main() {
+	cin >> n;
+	
+	for(int i = 0; i<n; i++) {
+		for(int j = 0; j<n; j++) {
+			cin >> map[i][j];
 		}
 	}
 	
-	for (di = 1; di <= num; di++) {
-		for (dj = 1; dj <= num; dj++) {
-			f = 0;
-
-			DFS(di);
-
-			for (int k = 1; k <= num; k++)
-				visit[k] = 0;
-		}
-	}
-
-	for (int i = 1; i <= num; i++) {
-		for (int j = 1; j <= num; j++) {
-			printf("%d ", D[i][j]);
+	for(int i = 0; i<n; i++) {
+		for(int j = 0; j<n; j++) {
+			dfs(i, true);
+			
+			if(visit[j] == true)
+				cout << 1 << " ";
+			else
+				cout << 0 << " ";
+				
+			memset(visit, 0, sizeof(visit));
 		}
 		printf("\n");
 	}
-
 	
 	return 0;
 }
