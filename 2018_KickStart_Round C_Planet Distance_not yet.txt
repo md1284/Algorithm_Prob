@@ -1,0 +1,94 @@
+#include <iostream>
+#include <vector>
+#include <cstring>
+#include <fstream>
+
+using namespace std;
+
+int t, n;
+int adj[1001][1001];
+int discovered[1001], group[1001], arr[1001];
+int counter;
+
+bool isBackedge(int here, int there) {
+	if(discovered[there] == -1)
+		return false;
+		
+	return true;
+}
+
+void dfs(int here) {
+	arr[counter] = here;
+	discovered[here] = counter++;
+
+	for(int there = 1; there <= n; there++) {
+		if(adj[here][there] == 0)
+			continue;
+			
+		if(isBackedge(here, there)) {
+			adj[here][there]--;
+			adj[there][here]--;
+			group[there] = there;
+			group[here] = there;
+			continue;
+		}
+		
+		adj[here][there]--;
+		adj[there][here]--;
+		dfs(there);
+		
+		if(group[there] != false && there != group[there])
+			group[here] = group[there];
+	}
+}
+
+int main() {
+	ifstream inf("A-large-practice.in");
+	ofstream outf("sol.txt");
+	
+	inf >> t;
+	
+	for(int i = 0; i<t; i++) {
+		inf >> n;
+		memset(discovered, -1, sizeof(discovered));
+		memset(group, 0, sizeof(group));
+		memset(arr, 0, sizeof(arr));
+		memset(adj, 0, sizeof(adj));
+		counter = 1;
+		
+		for(int j = 0; j<n; j++) {
+			int a, b;
+			inf >> a >> b;
+			
+			adj[a][b]++;
+			adj[b][a]++;
+		}
+		
+		dfs(1);
+		
+		int s = -1, e = -1;
+		for(int i = 1; i<=n; i++) {
+			if(s == -1 && group[i] != 0)
+				s = i;
+			else if(group[i] != 0)
+				e = i;
+		}
+		
+		outf << "Case #" << i+1 << ": ";
+		for(int i = 1; i<=n; i++) {
+			if(s == -1)
+				outf << 0 << " ";
+			else if(i < s)
+				outf << s - i << " ";
+			else if(e == -1 && s <= i)
+				outf << i - s << " ";
+			else if(s <= i && i <= e)
+				outf << 0 << " ";
+			else if(e < i)
+				outf << i - e << " ";
+		}
+		outf << endl;
+	}
+
+	return 0;
+}
