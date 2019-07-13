@@ -1,0 +1,44 @@
+#include <iostream>
+#include <vector>
+#include <cstring>
+
+using namespace std;
+
+int n, m;
+int a[101], c[101];
+int cache[101][10001];
+
+int solve(int index, int cost) {
+	if(index >= 100)	return 0;
+	
+	int& ret = cache[index][cost];
+	if(ret != -1)	return ret;
+	
+	ret = solve(index+1, cost);
+	if(c[index] <= cost)
+		ret = max(ret, solve(index+1, cost - c[index]) + a[index]);
+
+	return ret;
+}
+
+int main() {
+	cin >> n >> m;
+	
+	for(int i = 0; i<n; i++)
+		cin >> a[i];
+	for(int i = 0; i<n; i++)
+		cin >> c[i];
+	
+	memset(cache, -1, sizeof(cache));
+	
+	int cost = 0;
+	while(true) {
+		if(solve(0, cost) >= m) {
+			cout << cost << endl;
+			break;
+		}
+		cost++;
+	}
+
+	return 0;
+}
