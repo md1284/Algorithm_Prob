@@ -1,0 +1,61 @@
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+#define MAXN	200000
+typedef long long LL;
+
+const int mod = 1000000007;
+int n;
+LL a[MAXN + 1];
+
+struct FenwickTree {
+	vector<LL> tree;
+	FenwickTree(int n) : tree(n+1) {}
+	
+	LL sum(int pos) {
+		pos++;
+		LL ret = 0;
+		while(pos > 0) {
+			ret += tree[pos];
+			pos &= (pos-1);
+		}
+		return ret;
+	}
+	
+	void add(int pos, LL val) {
+		pos++;
+		while(pos < tree.size()) {
+			tree[pos] += val;
+			pos += (pos & -pos);
+		}
+	}
+};
+
+int main() {
+    cin >> n;
+	
+	FenwickTree cntft(MAXN), distft(MAXN);
+	for(int i = 0; i<n; i++) {
+		int x;
+		cin >> x;
+		
+		cntft.add(x, 1);
+		distft.add(x, x);
+		
+		if(i == 0)	continue;
+		a[i] = cntft.sum(x) * x - distft.sum(x);
+		a[i] += distft.sum(MAXN) - distft.sum(x) - (cntft.sum(MAXN) - cntft.sum(x)) * x;
+        a[i] %= mod;
+	}
+	
+	LL mul = 1;
+	for(int i = 1; i<n; i++) {
+		mul *= a[i];
+		mul %= mod;
+	}
+	printf("%lld", mul);
+	
+	return 0;
+}
