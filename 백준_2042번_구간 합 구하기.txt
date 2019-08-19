@@ -1,56 +1,57 @@
-#include <stdio.h>
+#include <iostream>
 #include <vector>
-#include <Windows.h>
 
 using namespace std;
 
+typedef long long ll;
+
+struct FenwickTree {
+	vector<ll> tree;
+	FenwickTree(int n) : tree(n + 1) {}
+	
+	ll sum(int pos) {
+		++pos;
+		ll ret = 0;
+		while(pos > 0) {
+			ret += tree[pos];
+			pos &= (pos - 1);
+		}
+		return ret;
+	}
+	
+	void add(int pos, ll val) {
+		++pos;
+		while(pos < tree.size()) {
+			tree[pos] += val;
+			pos += (pos & -pos);
+		}
+	}
+};
+
 int n, m, k;
 
-long long sum(vector<long long> &tree, int i) {
-	long long ans = 0;
-	
-	while (i > 0) {
-		ans += tree[i];
-		i -= (i & -i);
+int main() {
+    scanf("%d %d %d", &n, &m, &k);
+    
+	FenwickTree ft(n+1);
+	for(int i = 1; i<=n; i++) {
+		ll a;
+        cin >> a;
+		ft.add(i, a);
 	}
-
-	return ans;
-}
-
-void update(vector<long long> &tree, int i, long long diff) {
-	while (i < tree.size()) {
-		tree[i] += diff;
-		i += (i & -i);
-	}
-}
-
-
-int main(void) {
-	scanf("%d %d %d", &n, &m, &k);
-	vector<long long> tree(n + 1), arr(n + 1);
-
-	for (int i = 1; i <= n; i++) {
-		scanf("%lld", &arr[i]);
-		update(tree, i, arr[i]);
-	}
-
-	for (int i = 0; i < m + k; i++) {
+	for(int i = 0; i<m+k; i++) {
 		int a, b;
-		long long c;
-		scanf("%d %d %lld", &a, &b, &c);
-
-		if (a == 1) {
-			long long diff = c - arr[b];
-			arr[b] = c;
-
-			update(tree, b, diff);
+		ll c;
+		cin >> a >> b >> c;
+		
+		if(a == 1) {
+			int orib = ft.sum(b) - ft.sum(b-1);
+			ft.add(b, -orib);
+			ft.add(b, c);
 		}
-
-		else if (a == 2)
-			printf("%lld\n", sum(tree, c) - sum(tree, b - 1));
+		else
+			printf("%lld\n", ft.sum(c) - ft.sum(b-1));
 	}
-
-
-	system("pause");
+	
 	return 0;
 }
