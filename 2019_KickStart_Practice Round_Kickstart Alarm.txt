@@ -1,0 +1,144 @@
+#include <iostream>
+#include <vector>
+#include <fstream>
+
+using namespace std;
+
+typedef long long int LL;
+
+const int mod = 1000000007;
+int T, N, K, x, y, C, D, E1, E2, F;
+int ret;
+int powK[1000001];
+int psum[1000001];
+int ppsum[1000001];
+int pppsum[1000001];
+vector<int> A;
+
+int power(int a, int b) {
+	int ret = 1;
+	for(; b > 0; b >>= 1, a = (LL)a * a % mod) {
+		if(b & 1)
+			ret = (LL)ret * a % mod;
+	}
+	return ret;
+}
+
+int inverse(int a) {
+	return power(a, mod - 2);
+}
+
+void prev() {
+	for(int i = 1; i<=N; i++)
+		powK[i] = power(i, K);
+}
+
+// O(NlogK)
+int solve() {
+	ret = 0;
+	
+	psum[1] = K;
+	for(int i = 2; i<=N; i++)
+		psum[i] = ((LL)i * (power(i, K) - 1) % mod) * (LL)inverse(i - 1) % mod;
+
+	
+	ppsum[1] = psum[1];
+	for(int i = 2; i<=N; i++)
+		ppsum[i] = ((LL)ppsum[i-1] + psum[i]) % mod;	
+	
+	
+	for(int i = 1; i<=N; i++) {
+		if(i == 1) {
+			pppsum[i] = (LL)A[i] * K % mod;
+			//if(pppsum[i] < 0)
+			//	cout << "check! " << pppsum[i] << endl;
+		}
+		else {
+			pppsum[i] = ((LL)pppsum[i-1] + ((LL)A[i] * ppsum[i] % mod)) % mod;
+			
+			//if((LL)A[i] > mod || (LL)A[i] < 0)
+			//	cout << "check!" << endl;
+		
+			//if(pppsum[i] < 0)
+			//	cout << "check! " << pppsum[i] << endl;
+		}
+		
+		
+		if(pppsum[i] < 0) {
+			//cout << "i: " << i << "  check! pppsum[i]: " << pppsum[i] << endl;
+		}
+		
+		ret = ((LL)ret + pppsum[i]) % mod;
+	}
+	
+	return ret;
+}
+
+// O(N^2)
+int sol1() {
+	ret = 0;
+	for(int i = 1; i<=N; i++) {
+		printf("insolve i: %d\n", i);
+		
+		int sum = 0;
+		int sub = 0;
+		
+		for(int j = i; j<=N; j++) {
+			if(i == j)
+				sub = (LL)A[i] * K % mod;
+			else {
+				int x = (LL)A[j] * (j-i+1) % mod;
+				x = (LL)x * (powK[j-i+1]-1) % mod;
+				x = (LL)x * inverse(j-i) % mod;
+				
+				sub = ((LL)sub + x) % mod;
+			}
+			sum = ((LL)sum + sub) % mod;
+		}
+		
+		ret = ((LL)ret + sum) % mod;
+	}
+	return ret;
+}
+
+// O(N^3 * K)
+int sol2() {
+	ret = 0;
+	for(int k = 1; k<=K; k++) {
+		for(int L = 1; L<=N; L++) {
+			for(int R = L; R<=N; R++) {
+				for(int j = L; j<=R; j++) {
+					ret = (LL)ret + (LL)A[j] * power(j-L+1, k) % mod;
+					ret %= mod;
+				}
+			}
+		}
+	}
+	return ret;
+}
+
+int main() {
+	scanf("%d", &T);
+	//fstream inf("prob.txt");
+	//inf >> T;
+	
+	for(int i = 0; i<T; i++) {
+		scanf("%d %d %d %d %d %d %d %d %d", &N, &K, &x, &y, &C, &D, &E1, &E2, &F);
+		//inf >> N >> K >> x >> y >> C >> D >> E1 >> E2 >> F;
+		
+		
+		A = vector<int>(N + 1);	
+		prev();
+		for(int j = 1; j<=N; j++) {
+			A[j] = ((LL)x + y) % F;
+			
+			int x1 = x, y1 = y;
+			x = ((LL)C * x1 % F + (LL)D * y1 % F + (LL)E1) % F;
+			y = ((LL)D * x1 % F + (LL)C * y1 % F + (LL)E2) % F;
+		}
+		
+		printf("Case #%d: %d\n", i+1, solve());
+	}
+	
+	return 0;
+}
