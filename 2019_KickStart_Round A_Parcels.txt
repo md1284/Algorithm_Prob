@@ -1,0 +1,116 @@
+#include <iostream>
+#include <queue>
+#include <vector>
+#include <cstring>
+#include <cmath>
+#include <fstream>
+
+using namespace std;
+
+const int INF = 5001;
+int T, R, C;
+int rc[251][251], cost[251][251];
+int mov[4][2] = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+queue<pair<int, int> > q;
+
+void bfs() {
+	while(!q.empty()) {
+		int r = q.front().first, c = q.front().second;
+		q.pop();
+		
+		for(int type = 0; type<4; type++) {
+			int y = r + mov[type][0];
+			int x = c + mov[type][1];
+			
+			if(y < 1 || y > R || x < 1 || x > C)	continue;
+			if(rc[y][x] == 1)	continue;
+			
+			if(cost[y][x] == 0) {
+				cost[y][x] = cost[r][c] + 1;
+				q.push(make_pair(y, x));
+			}
+		}
+	}
+}
+
+bool inspector(int k) {
+	int dmnx = INF, dmny = INF;
+	int dmxx = -INF, dmxy = -INF;
+	for(int r = 1; r<=R; r++) {
+		for(int c = 1; c<=C; c++) {
+			if(cost[r][c] >= k) {
+				dmnx = min(dmnx, r-c);
+				dmxx = max(dmxx, r-c);
+				dmny = min(dmny, r+c);
+				dmxy = max(dmxy, r+c);
+			}
+		}
+	}
+	
+	if(dmxx == -INF)	return true;
+	
+	for(int r = 1; r<=R; r++) {
+		for(int c = 1; c<=C; c++) {
+			int x = r - c;
+			int y = r + c;
+			
+			int d = -INF;
+			d = max(d, abs(x - dmnx));
+			d = max(d, abs(dmxx - x));
+			d = max(d, abs(y - dmny));
+			d = max(d, abs(dmxy - y));
+			
+			if(d < k)
+				return true;
+		}
+	}
+	return false;
+}
+
+int solve() {
+	if(q.size() == R * C)	return 0;
+	bfs();
+	
+	int lo = 0, hi = R+C, m;
+	while(lo <= hi) {
+		m = (lo + hi) / 2;
+	
+		if(inspector(m) == true)
+			hi = m-1;
+		else
+			lo = m+1;
+	}
+	
+	return hi;	// hi == k-1
+}
+
+int main() {
+	scanf("%d", &T);
+	//fstream inf("prob.txt");
+	//inf >> T;
+	
+	for(int i = 1; i<=T; i++) {
+		scanf("%d %d", &R, &C);
+		//inf >> R >> C;
+		
+		memset(rc, 0, sizeof(rc));
+		memset(cost, 0, sizeof(cost));
+		while(!q.empty())	q.pop();
+		
+		for(int r = 1; r<=R; r++) {
+			string s;
+			cin >> s;
+			//inf >> s;
+			
+			for(int c = 1; c<=C; c++) {
+				rc[r][c] = s[c-1] - '0';
+				if(rc[r][c] == 1)
+					q.push(make_pair(r, c));
+			}
+		}
+		
+		printf("Case #%d: %d\n", i, solve());
+	}
+
+	return 0;
+}
