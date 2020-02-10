@@ -1,0 +1,49 @@
+#include <iostream>
+#include <vector>
+#include <cstring>
+#include <fstream>
+
+using namespace std;
+
+int T, N;
+int b[5000001];
+
+int solve() {
+	int ret = 0;
+	int sum = 0, mlen = N&1 ? N/2+1 : N/2;
+	
+	for(int i = 1; i<=mlen; i++)
+		sum += b[i];
+		
+	ret = sum;
+	for(int i = mlen+1; i<=N; i++) {
+		sum -= b[i-mlen];
+		sum += b[i];
+		ret = max(ret, sum);
+	}
+	
+	
+	return ret;
+}
+
+int main() {
+	scanf("%d", &T);
+	//fstream inf("prob.txt");
+	//inf >> T;
+	
+	for(int i = 1; i<=T; i++) {
+		scanf("%d", &N);
+		//inf >> N;
+		
+		memset(b, 0, sizeof(b));
+		string s;
+		cin >> s;
+		//inf >> s;
+		for(int j = 0; j<s.size(); j++)
+			b[j+1] = s[j] - '0';
+
+		printf("Case #%d: %d\n", i, solve());
+	}
+	
+	return 0;
+}
