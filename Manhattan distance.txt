@@ -1,0 +1,16 @@
+Manhattan dist( (x1, y1), (x2, y2) ) = |x1-x2| + |y1-y2|
+=max{ |x1+y1 - (x2+y2)| , |x1-y1 - (x2-y2)| }
+by |a| + |b| = max{ |a+b| , |a-b| } simply.
+
+pf) Let: (s, t) = (x-y, x+y)
+Manhattan dist( (x1, y1), (x2, y2) ) = |x1-x2| + |y1-y2|
+s=x-y, t=x+y => x=(s+t)/2, y=(-s+t)/2
+then, Manhattan dist( (x1, y1), (x2, y2) ) = |(s1+t1-s2-t2)/2| + |(-s1+t1+s2-t2)/2|
+= max{ |t1-t2|, |s1-s2| } by |a| + |b| = max{ |a+b| , |a-b| }.
+
+Let (x, y) is fixed and find (xi, yi) such that max_i Manhattan dist((x,y), (xi,yi)).
+then, max_i dist((x,y), (xi, yi)) = max{ max_i{ |s-si|, |t-ti| } }
+= max{ s - min_i si, max_i si - s, t - min_i ti, max_i ti - t }
+= max{ max_i (xi+yi) - (x+y), (x+y) - min_i (xi+yi), max_i (xi-yi) - (x-y), (x-y) - min_i (xi-yi) }
+
+Conclude that we should search just four cases such that max_i (xi+yi) - (x+y), (x+y) - min_i (xi+yi), max_i (xi-yi) - (x-y), (x-y) - min_i (xi-yi)
