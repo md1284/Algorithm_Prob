@@ -1,0 +1,60 @@
+#include <iostream>
+#include <cstring>
+#include <fstream>
+
+using namespace std;
+
+int T, N, Q;
+int freq[100002];
+
+int bitcount(int n) {
+	int cnt = 0;
+	
+	while(n > 0) {
+		if(n & 1)	cnt++;
+		n = n>>1;
+	}
+	
+	return cnt;
+}
+
+int main() {
+	scanf("%d", &T);
+	//fstream inf("prob.txt");
+	//inf >> T;
+	
+	
+	for(int i = 1; i<=T; i++) {
+		scanf("%d %d", &N, &Q);
+		//inf >> N >> Q;
+		
+		memset(freq, 0, sizeof(freq));
+		int ret = 0;
+		string s;
+		cin >> s;
+		//inf >> s;
+		
+		for(int j = 1; j<=s.size(); j++) {
+			int n = s[j-1] - 'A';
+			freq[j] = freq[j-1] ^ (1<<n);
+		}
+		
+		for(int j = 0; j<Q; j++) {
+			int left, right;
+			scanf("%d %d", &left, &right);
+			//inf >> left >> right;
+			
+			int cnt = bitcount(freq[right] ^ freq[left-1]);
+			
+			if(cnt == 0)
+				ret++;
+			else if(cnt == 1 && ((right-left+1) & 1))
+				ret++;
+		}
+
+		printf("Case #%d: %d\n", i, ret);
+	}
+	
+	
+	return 0;
+}
