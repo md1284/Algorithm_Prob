@@ -1,0 +1,59 @@
+#include <iostream>
+#include <vector>
+#include <cstring>
+#include <algorithm>
+#include <fstream>
+
+using namespace std;
+
+int T, N;
+int cache[10001][101];
+
+struct Stone {
+	int S, E, L;
+};
+
+bool comp(Stone a, Stone b) {
+	if(a.L == 0 && b.L == 0)	return a.S < b.S;
+	if(a.L == 0)	return false;
+	if(b.L == 0)	return true;
+	
+	return 1.0*a.S/a.L < 1.0*b.S/b.L;
+}
+
+int solve(int time, int index, Stone st[]) {
+	if(index == N)	return 0;
+	
+	int& ret = cache[time][index];
+	if(ret != -1)	return ret;
+
+	ret = solve(time, index+1, st);
+	ret = max(ret, solve(time+st[index].S, index+1, st) + st[index].E-st[index].L*time);
+
+	return ret;
+}
+
+int main() {
+	scanf("%d", &T);
+	//fstream inf("prob.txt");
+	//inf >> T;
+	
+	for(int i = 1; i<=T; i++) {
+		scanf("%d", &N);
+		//inf >> N;
+
+		memset(cache, -1, sizeof(cache));
+		Stone st[101];
+		
+		for(int j = 0; j<N; j++) {
+			scanf("%d %d %d", &st[j].S, &st[j].E, &st[j].L);
+			//inf >> st[j].S >> st[j].E >> st[j].L;
+		}
+		
+		sort(st, st+N, comp);
+		printf("Case #%d: %d\n", i, solve(0, 0, st));
+	}
+	
+	
+	return 0;
+}
