@@ -1,0 +1,70 @@
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
+typedef long long LL;
+
+const int S = 1e5;
+int N;
+int H[S+5], Tree[4*S+5];
+
+LL solve(int left, int right) {
+	if(right < left)	return -1;
+	if(left == right)	return H[left];
+	
+	int mid = (left+right)/2;
+	LL l = solve(left, mid);
+	LL r = solve(mid+1, right);
+	
+	LL ret = H[mid], sum = 0;
+	int h = H[mid], s, e;
+	s = e = mid;
+
+	while(left <= s && e <= right) {
+		if(left == s && e == right)	break;
+		
+		if(left == s) {
+			h = min(h, H[e+1]);
+			e++;
+		}
+		else if(right == e) {
+			h = min(h, H[s-1]);
+			s--;
+		}
+		else if(H[s-1] < H[e+1]) {
+			h = min(h, H[e+1]);
+			e++;
+		}
+		else if(H[s-1] >= H[e+1]) {
+			h = min(h, H[s-1]);
+			s--;
+		}
+		sum = (LL)h*(e-s+1);
+		ret = max(ret, sum);
+	}
+	
+	ret = max(ret, l);
+	return max(ret, r);
+}
+
+void update()
+
+int main() {
+	//fstream inf("prob.txt");
+
+	while(true) {
+		//inf >> N;
+		scanf("%d", &N);
+		if(N == 0)	break;
+		
+		for(int i = 1; i<=N; i++) {
+			//inf >> H[i];
+			scanf("%d", &H[i]);
+		}
+		printf("%lld\n", solve(1, N));
+	}
+	
+	
+	return 0;
+}
