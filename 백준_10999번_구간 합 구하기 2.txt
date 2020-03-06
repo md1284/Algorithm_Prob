@@ -1,0 +1,89 @@
+#include <iostream>
+#include <cmath>
+#include <fstream>
+
+using namespace std;
+
+typedef long long LL;
+
+const int S = 1e6;
+int N, M, K;
+LL Tree[4*S+5], A[S+5], lazy[4*S+5];
+
+LL init(int bucket, int start, int end) {
+	if(start == end)	return Tree[bucket] = A[start];
+	
+	return Tree[bucket] = init(bucket*2, start, (start+end)/2) 
+						+ init(bucket*2+1, (start+end)/2+1, end);
+}
+
+void rupdate(int bucket, int start, int end, int left, int right, LL x) {
+	if(lazy[bucket] != 0) {
+		Tree[bucket] += (end-start+1)*lazy[bucket];
+		if(start != end) {
+			lazy[bucket*2] += lazy[bucket];
+			lazy[bucket*2+1] += lazy[bucket];
+		}
+		lazy[bucket] = 0;
+	}
+	
+	if(right < start || end < left)	return;
+	
+	if(left <= start && end <= right) {
+		Tree[bucket] += (end-start+1)*x;
+		if(start != end) {
+			lazy[bucket*2] += x;
+			lazy[bucket*2+1] += x;
+		}
+		return;
+	}
+	rupdate(bucket*2, start, (start+end)/2, left, right, x);
+	rupdate(bucket*2+1, (start+end)/2+1, end, left, right, x);
+	
+	Tree[bucket] = Tree[bucket*2] + Tree[bucket*2+1];
+}
+
+LL get(int bucket, int start, int end, int left, int right) {
+	if(lazy[bucket] != 0) {
+		Tree[bucket] += (end-start+1)*lazy[bucket];
+		if(start != end) {
+			lazy[bucket*2] += lazy[bucket];
+			lazy[bucket*2+1] += lazy[bucket];
+		}
+		lazy[bucket] = 0;
+	}
+
+	if(right < start || end < left)	return 0;
+	if(left <= start && end <= right)	return Tree[bucket];
+	
+	return get(bucket*2, start, (start+end)/2, left, right) 
+		+ get(bucket*2+1, (start+end)/2+1, end, left, right);
+}
+
+int main() {
+	//fstream inf("prob.txt");
+	//inf >> N >> M >> K;
+	scanf("%d %d %d", &N, &M, &K);
+	
+	for(int i = 1; i<=N; i++) {
+		//inf >> A[i];
+		scanf("%d", &A[i]);
+	}
+	init(1, 1, N);
+	for(int i = 1; i<=M+K; i++) {
+		int a, b, c;
+		LL x;
+		//inf >> a >> b >> c;
+		scanf("%d %d %d", &a, &b, &c);
+		
+		if(a == 1) {
+			//inf >> x;
+			scanf("%lld", &x);
+			rupdate(1, 1, N, b, c, x);
+		}
+		else
+			printf("%lld\n", get(1, 1, N, b, c));
+	}
+
+	return 0;
+}
