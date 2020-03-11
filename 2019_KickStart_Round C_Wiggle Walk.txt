@@ -1,0 +1,123 @@
+#include <iostream>
+#include <set>
+#include <cstring>
+#include <fstream>
+
+using namespace std;
+
+const int SZ = 5e4;
+int T, N, R, C, sr, sc;
+set<pair<int, int> > pr[2*SZ+5], pc[2*SZ+5];
+string inst;
+
+void concate(int cr, int cc) {	
+	set<pair<int, int> >::iterator xpos, ypos, tmp;
+	xpos = pr[cr].lower_bound(make_pair(cc+1, 0));
+	ypos = pc[cc].lower_bound(make_pair(cr+1, 0));
+	
+	tmp = xpos;
+	if(xpos != pr[cr].begin())
+		--tmp;
+		
+	if(xpos != pr[cr].end() && cc+1 == xpos->first) {
+		if(xpos != pr[cr].begin() && cc-1 == tmp->second) {
+			pr[cr].insert(make_pair(tmp->first, xpos->second));
+			pr[cr].erase(xpos);
+			pr[cr].erase(tmp);
+		}
+		else {
+			pr[cr].insert(make_pair(cc, xpos->second));
+			pr[cr].erase(xpos);
+		}
+	}
+	else if(xpos != pr[cr].begin()) {
+		--xpos;
+		if(cc-1 == xpos->second) {
+			pr[cr].insert(make_pair(xpos->first, cc));
+			pr[cr].erase(xpos);
+		}
+		else
+			pr[cr].insert(make_pair(cc, cc));
+	}
+	else
+		pr[cr].insert(make_pair(cc, cc));
+	
+	
+	tmp = ypos;
+	if(ypos != pc[cc].begin())
+		--tmp;
+	if(ypos != pc[cc].end() && cr+1 == ypos->first) {
+		if(ypos != pc[cc].begin() && cr-1 == tmp->second) {
+			pc[cc].insert(make_pair(tmp->first, ypos->second));
+			pc[cc].erase(ypos);
+			pc[cc].erase(tmp);
+		}
+		else {
+			pc[cc].insert(make_pair(cr, ypos->second));
+			pc[cc].erase(ypos);
+		}
+	}
+	else if(ypos != pc[cc].begin()) {
+		--ypos;
+		if(cr-1 == ypos->second) {
+			pc[cc].insert(make_pair(ypos->first, cr));
+			pc[cc].erase(ypos);
+		}
+		else
+			pc[cc].insert(make_pair(cr, cr));
+	}
+	else
+		pc[cc].insert(make_pair(cr, cr));
+}
+
+pair<int, int> solve() {
+	int cr = N, cc = N;
+	pr[cr].insert(make_pair(cc, cc));
+	pc[cc].insert(make_pair(cr, cr));
+	
+	set<pair<int, int> >::iterator xpos, ypos;
+	for(int i = 0; i<N; i++) {
+		if(inst[i] == 'E' || inst[i] == 'W') {
+			xpos = (--pr[cr].lower_bound(make_pair(cc+1, 0)));
+			if(inst[i] == 'E')
+				cc = xpos->second+1;
+			else if(inst[i] == 'W')
+				cc = xpos->first-1;
+		}
+		else if(inst[i] == 'N' || inst[i] == 'S') {
+			ypos = (--pc[cc].lower_bound(make_pair(cr+1, 0)));
+			if(inst[i] == 'N')
+				cr = ypos->first-1;
+			else if(inst[i] == 'S')
+				cr = ypos->second+1;
+		}
+		
+		//printf("cr: %d cc: %d\n", cr-N, cc-N);
+		concate(cr, cc);
+	}
+	return make_pair(cr, cc);
+}
+
+int main() {
+	ios_base::sync_with_stdio(false);
+	cin.tie(NULL);
+	//fstream inf("prob.txt");
+	//inf >> T;
+	cin >> T;
+	
+	for(int i = 1; i<=T; i++) {
+		//inf >> N >> R >> C >> sr >> sc;
+		//inf >> inst;
+		cin >> N >> R >> C >> sr >> sc;
+		cin >> inst;
+		
+		for(int j = 0; j<2*N+5; j++) {
+			pr[j].clear();
+			pc[j].clear();
+		}
+		
+		pair<int, int> ret = solve();
+		printf("Case #%d: %d %d\n", i, sr+ret.first-N, sc+ret.second-N);
+	}
+	return 0;
+}
