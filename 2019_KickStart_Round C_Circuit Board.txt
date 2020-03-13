@@ -1,0 +1,80 @@
+#include <iostream>
+#include <stack>
+#include <cstring>
+#include <fstream>
+
+using namespace std;
+
+const int S = 3e2, INF = 987654321;
+int T, R, C, k;
+int V[S+5][S+5], PV[S+5][S+5];
+
+void prev() {
+	for(int r = 1; r<=R; r++) {
+		for(int c = 1; c<=C; c++) {
+			int l = INF, h = -INF;
+			for(int i = c; i<=C; i++) {
+				l = min(l, V[r][i]);
+				h = max(h, V[r][i]);
+				
+				if(h-l <= k)
+					PV[r][c] = i;
+				else
+					break;
+			}
+		}
+	}
+
+	for(int r = 1; r<=R; r++)
+		for(int c = 1; c<=C; c++)
+			PV[r][c] = PV[r][c]-c+1;
+}
+
+int solve() {
+	prev();
+	
+	int ret = 1;
+	for(int c = 1; c<=C; c++) {
+		stack<int> st;
+		st.push(0);
+		PV[0][c] = PV[R+1][c] = 0;
+		
+		for(int r = 1; r<=R+1; r++) {
+			if(PV[r][c] < PV[r-1][c]) {
+				while(!st.empty() && PV[r][c] < PV[st.top()][c]) {
+					int h = PV[st.top()][c];
+					st.pop();
+					
+					if(!st.empty())
+						ret = max(ret, h*(r-st.top()-1));
+				}
+			}
+			st.push(r);
+		}
+	}
+	return ret;
+}
+
+int main() {
+	ios_base::sync_with_stdio(false);
+	cin.tie(NULL);
+	//fstream inf("prob.txt");
+	//inf >> T;
+	cin >> T;
+	
+	for(int i = 1; i<=T; i++) {
+		//inf >> R >> C >> k;
+		cin >> R >> C >> k;
+		
+		memset(V, 0, sizeof(V));
+		memset(PV, 0, sizeof(PV));
+		for(int r = 1; r<=R; r++) {
+			for(int c = 1; c<=C; c++) {
+				//inf >> V[r][c];
+				cin >> V[r][c];
+			}
+		}
+		printf("Case #%d: %d\n", i, solve());
+	}
+	return 0;
+}
