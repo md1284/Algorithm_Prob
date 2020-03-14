@@ -6,10 +6,12 @@ using namespace std;
 
 const int S = 1e5;
 int N, M;
-int d[S+5], anc[S+5][22];
-bool visited[S+5];
+int order = 1, idx[S+5], d[S+5], E[2*S+5], lg[2*S+5], anc[S+5][22];
+pair<int, int> ST[2*S+5][21];
 vector<int> Tree[S+5];
+bool visited[S+5];
 
+// LCA (Initial: O(NlogN), Query: O(logN))
 void dfs(int here, int depth) {
 	visited[here] = true;
 	d[here] = depth;
@@ -50,6 +52,50 @@ int lca(int a, int b) {
 	return anc[a][0];
 }
 
+// LCA with Sparse Table (Initial: O(NlogN), Query: O(1))
+void dfs_ST(int here, int depth) {
+	visited[here] = true;
+	E[order] = here;
+	d[here] = depth;
+	idx[here] = order;
+	++order;
+	
+	for(int i = 0; i<Tree[here].size(); ++i) {
+		int next = Tree[here][i];
+		if(visited[next] == true)	continue;
+		
+		dfs_ST(next, depth+1);
+		E[order] = here;
+		++order;
+	}
+}
+
+void prev_ST() {
+	for(int i = 1; i<=2*N; ++i)
+		ST[i][0] = make_pair(d[E[i]], E[i]);
+	for(int j = 1; j<=20; ++j) {
+		for(int i = 1; i<=2*N-(1<<j); ++i)
+			ST[i][j] = min(ST[i][j-1], ST[i+(1<<(j-1))][j-1]);
+	}
+	
+	lg[1] = 0;
+	for(int i = 1; i<=20; ++i) {
+		if((1<<i) <= 2*N)
+			lg[(1<<i)] = i;
+	}
+	for(int i = 2; i<=2*N; ++i)
+		if(lg[i] == 0)	lg[i] = lg[i-1];
+}
+
+int lca_ST(int a, int b) {
+	a = idx[a];
+	b = idx[b];
+	
+	if(b < a)	swap(a, b);
+
+	int k = lg[b-a+1];
+	return min(ST[a][k], ST[b-(1<<k)+1][k]).second;
+}
 
 int main() {
 	ios_base::sync_with_stdio(false);
@@ -58,24 +104,25 @@ int main() {
 	//inf >> N;
 	cin >> N;
 	
-	for(int i = 1; i<N; i++) {
-		int a, b;
-		//inf >> a >> b;
-		cin >> a >> b;
-		Tree[a].push_back(b);
-		Tree[b].push_back(a);
-	}
-	dfs(1, 1);
-	btup();
-	
-	//inf >> M;
-	cin >> M;
-	for(int i = 1; i<=M; i++) {
+	for(int i = 1; i<=N-1; ++i) {
 		int a, b;
 		//inf >> a >> b;
 		cin >> a >> b;
 		
-		printf("%d\n", lca(a, b));
+		Tree[a].push_back(b);
+		Tree[b].push_back(a);
+	}
+	dfs_ST(1, 1);
+	prev_ST();
+	
+	//inf >> M;
+	cin >> M;
+	for(int i = 1; i<=M; ++i) {
+		int a, b;
+		//inf >> a >> b;
+		cin >> a >> b;
+		
+		printf("%d\n", lca_ST(a, b));
 	}
 	
 	return 0;
