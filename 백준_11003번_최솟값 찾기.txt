@@ -1,0 +1,28 @@
+#include <iostream>
+#include <deque>
+#include <fstream>
+
+using namespace std;
+
+int N, L;
+deque<pair<int, int> > dq;
+
+int main() {
+	ios_base::sync_with_stdio(false);
+	cin.tie(NULL);
+	//fstream inf("prob.txt");
+	//inf >> N >> L;
+	cin >> N >> L;
+	
+	int a;
+	for(int i = 1; i<=N; i++) {
+		while(!dq.empty() && dq.front().second <= i-L)	dq.pop_front();
+		//inf >> a;
+		cin >> a;
+		while(!dq.empty() && dq.back().first >= a)	dq.pop_back();
+		dq.push_back(make_pair(a, i));
+		printf("%d ", dq.front().first);
+	}
+
+	return 0;
+}
