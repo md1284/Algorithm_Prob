@@ -1,91 +1,62 @@
 #include <iostream>
 #include <stack>
+#include <fstream>
 
 using namespace std;
 
+string s;
 
-// [), (]
-int solve(stack<char> st) {
-	stack<char> at, ct;
-	stack<char> bt(st);
+int solve() {
 	int ret = 0;
+	int temp = 1;
+	bool check = false;
+	stack<int> st;
 	
-	while(!st.empty()) {
-		if(st.top() == ')')	at.push(')');
-		else if(st.top() == ']')	at.push(']');
-		else if(st.top() == '(') {
-			if(at.empty() || at.top() == ']')	return 0;
-			at.pop();
+	for (int i = 0; i < s.size(); i++) {
+		if (s[i] == '(') {
+			temp *= 2;
+			st.push('(');
 		}
-		else if(st.top() == '[') {
-			if(at.empty() || at.top() == ')')	return 0;
-			at.pop();
+		else if (s[i] == '[') {
+ 			temp *= 3;
+ 			st.push('[');
 		}
-		st.pop();
+		else if (s[i] == ')' && (st.empty() || st.top() != '(')) {
+			check = true;
+			break;
+		}
+		else if (s[i] == ']' && (st.empty() || st.top() != '[')) {
+			check = true;
+			break;
+		}
+		else if (s[i] == ')') {
+			if (s[i - 1] == '(')
+				ret += temp;
+			st.pop();
+			temp /= 2;
+		}
+		else if (s[i] == ']') {
+			if (s[i - 1] == '[')
+				ret += temp;
+			st.pop();
+			temp /= 3;
+		}
 	}
-	if(!at.empty())	return 0;
-	
-	while(!bt.empty()) {
-		if(bt.top() == ')')	ct.push(')');
-		else if(bt.top() == ']')	ct.push(']');
-		else if(bt.top() == '(') {
-			if(ct.top() == ')') {
-				ct.pop();
-				ct.push('2');
-			}
-			else {
-				int a = ct.top() - '0';
-				ct.pop();
-				ct.pop();
-				ct.push(char(a*2+'0'));
-			}
-		}
-		else if(bt.top() == '[') {
-			if(ct.top() == ']') {
-				ct.pop();
-				ct.push('3');
-			}
-			else {
-				int a = ct.top() - '0';
-				ct.pop();
-				ct.pop();
-				ct.push(char(a*3+'0'));
-			}
-		}
-		
-		if(ct.top() != ')' && ct.top() != ']') {
-			int a = ct.top() - '0';
-			ct.pop();
-			
-			if(!ct.empty() && ct.top() != ')' && ct.top() != ']') {
-				int b = ct.top() - '0';
-				ct.pop();
-				ct.push(char(a+b+'0'));
-			}
-			else
-				ct.push(char(a+'0'));
-		}
-		
-		bt.pop();
-	}	
-	
-	while(!ct.empty()) {
-		ret += ct.top() - '0';
-		ct.pop();
-	}
-	
-	return ret;
+	if (check || !st.empty())
+		return 0;
+	else
+		return ret;
+	return 0;
 }
 
 int main() {
-	stack<char> st;
-	string s;
+	ios_base :: sync_with_stdio(false);
+	cin.tie(NULL); cout.tie(NULL);
+	//fstream inf("prob.txt");
+	//inf >> s;
 	cin >> s;
 	
-	for(int i = 0; i<s.size(); i++)
-		st.push(s[i]);
-		
-	cout << solve(st) << endl;	
+	printf("%d", solve());
 	
 	return 0;
 }
