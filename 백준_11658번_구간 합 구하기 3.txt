@@ -1,0 +1,91 @@
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
+const int S = 1024;
+int N, M;
+int G[S+5][S+5], Tree[S+5][S+5];
+
+void update(int y, int x, int c) {
+	int r;
+	
+	while(x<=N) {
+		r = y;
+		while(r<=N) {
+			Tree[r][x] += c;
+			r += (r&-r);
+		}
+		x += (x&-x);
+	}
+}
+
+int get(int y, int x) {
+	int ret = 0, r;
+	
+	while(x>0) {
+		r = y;
+		while(r>0) {
+			ret += Tree[r][x];
+			r -= (r&-r);
+		}
+		x -= (x&-x);
+	}
+	return ret;
+}
+
+int main() {
+	ios_base::sync_with_stdio(false);
+	cin.tie(NULL); cout.tie(NULL);
+	//fstream inf("prob.txt");
+	//inf >> N >> M;
+	cin >> N >> M;
+	
+	for(int i = 1; i<=N; i++) {
+		for(int j = 1; j<=N; j++) {
+			//inf >> G[i][j];
+			cin >> G[i][j];
+			Tree[i][j] = G[i][j];
+		}
+	}
+	
+	for(int k, i = 1; i<=N; i++) {
+		for(int j = 1; j<=N; j++) {
+			k = j+(j&-j);
+			if(k<=N)
+				Tree[i][k] += Tree[i][j];
+		}
+	}
+	for(int k, i = 1; i<=N; i++) {
+		for(int j = 1; j<=N; j++) {
+			k = j+(j&-j);
+			if(k<=N)
+				Tree[k][i] += Tree[j][i];
+		}
+	}
+	
+	int w, x, y, c, x2, y2;
+	for(int i = 1; i<=M; i++) {
+		//inf >> w;
+		cin >> w;
+
+		if(w == 0) {
+			//inf >> y >> x >> c;
+			cin >> y >> x >> c;
+			
+			update(y, x, c-G[y][x]);
+			G[y][x] = c;
+		}
+		else {
+			//inf >> y >> x >> y2 >> x2;
+			cin >> y >> x >> y2 >> x2;
+			if(y2 < y) {
+				swap(y, y2);
+				swap(x, x2);
+			}
+			cout << get(y2, x2)-get(y-1, x2)-get(y2, x-1)+get(y-1, x-1) << "\n";
+		}
+	}
+	
+	return 0;
+}
