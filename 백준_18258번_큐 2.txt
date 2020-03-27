@@ -1,5 +1,5 @@
 #include <iostream>
-#include <deque>
+#include <queue>
 #include <fstream>
 
 using namespace std;
@@ -14,35 +14,22 @@ int main() {
 	//inf >> N;
 	cin >> N;
 	
-	deque<int> q;
+	queue<int> q;
 	for(int x, i = 0; i<N; i++) {
 		//inf >> ins;
 		cin >> ins;
 		
-		if(ins == "push_front") {
+		if(ins == "push") {
 			//inf >> x;
 			cin >> x;
-			q.push_front(x);
+			q.push(x);
 		}
-		else if(ins == "push_back") {
-			//inf >> x;
-			cin >> x;
-			q.push_back(x);
-		}
-		else if(ins == "pop_front") {
+		else if(ins == "pop") {
 			if(q.empty())
 				printf("-1\n");
 			else {
 				printf("%d\n", q.front());
-				q.pop_front();
-			}
-		}
-		else if(ins == "pop_back") {
-			if(q.empty())
-				printf("-1\n");
-			else {
-				printf("%d\n", q.back());
-				q.pop_back();
+				q.pop();
 			}
 		}
 		else if(ins == "size")
