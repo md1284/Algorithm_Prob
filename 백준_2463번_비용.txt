@@ -1,0 +1,114 @@
+#include <iostream>
+#include <vector>
+#include <stack>
+#include <algorithm>
+#include <fstream>
+
+using namespace std;
+
+typedef long long ll;
+
+const int S = 1e5, mod = 1e9;
+int N, M;
+int st[S+5];
+ll d[S+5], psum[S+5], ret;
+vector<pair<int,int>> adj[S+5];
+vector<pair<int, pair<int,int>>> edge;
+
+bool cmp(pair<int, pair<int,int>> &a, pair<int, pair<int,int>> &b) {
+	if(a.first == b.first)
+		return b.second.first < a.second.first;
+	
+	return b.first < a.first;
+}
+
+int findRoot(int a) {
+	int t;
+	stack<int> stk;
+	
+	while(st[a] != a) {
+		stk.push(a);
+		a = st[a];
+	}
+	while(!stk.empty()) {
+		t = stk.top();
+		stk.pop();
+		st[t] = a;
+	}
+	return a;
+}
+
+void join(int a, int b) {
+	a = findRoot(a);
+	b = findRoot(b);
+	
+	if(a == b)
+		return;
+		
+	if(d[a] < d[b]) {
+		st[a] = b;
+		d[b] += d[a];
+	}
+	else if(d[b] < d[a]) {
+		st[b] = a;
+		d[a] += d[b];
+	}
+	else {
+		st[b] = a;
+		d[a] += d[b];
+	}
+}
+
+void kruskal() {
+	sort(edge.begin(), edge.end(), cmp);
+	
+	for(int i = 1; i<=N; i++) {
+		st[i] = i;
+		d[i] = 1;
+	}
+		
+	psum[0] = (ll)edge[M-1].first;
+	for(int i = 1; i<M; i++)
+		psum[i] = psum[i-1] + edge[M-i-1].first;
+	
+	for(int u,v,w,i = 0; i<M; i++) {
+		u = edge[i].second.first;
+		v = edge[i].second.second;
+		w = edge[i].first;
+		
+		u = findRoot(u);
+		v = findRoot(v);
+		
+		if(u != v) {
+			ret += (d[u]*d[v]%mod)*psum[M-i-1] % mod;
+			ret %= mod;
+			join(u, v);
+		}
+	}
+}
+
+int main() {
+	ios_base::sync_with_stdio(false);
+	cin.tie(NULL); cout.tie(NULL);
+	//fstream inf("prob.txt");
+	//inf >> N >> M;
+	cin >> N >> M;
+	
+	for(int x,y,w,i = 0; i<M; i++) {
+		//inf >> x >> y >> w;
+		cin >> x >> y >> w;
+		
+		if(y < x)
+			swap(x, y);
+
+		adj[x].push_back({y,w});
+		adj[y].push_back({x,w});
+		
+		edge.push_back({w, {x, y}});
+	}
+	
+	kruskal();
+	printf("%lld", ret);
+	
+	return 0;
+}
