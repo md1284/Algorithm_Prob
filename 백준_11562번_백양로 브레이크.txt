@@ -1,0 +1,64 @@
+#include <iostream>
+#include <algorithm>
+#include <fstream>
+
+using namespace std;
+
+const int INF = 987654321;
+int N, M, k;
+int adj[251][251];
+
+void Floyd() {
+    for (int k = 1; k <= N; k++) {
+        for (int i = 1; i <= N; i++) {
+            for (int j = 1; j <= N; j++) {
+                adj[i][j] = min(adj[i][j], adj[i][k] + adj[k][j]);
+            }
+        }
+    }
+}
+
+int main(void) {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
+    //fstream inf("prob.txt");
+    //inf >> N >> M;
+    cin >> N >> M;
+
+    for (int i = 1; i <= N; i++) {
+        for (int j = 1; j <= N; j++) {
+            if (i == j)
+                adj[i][j] = 0;
+            else
+                adj[i][j] = INF;
+        }
+    }
+
+    for (int u,v,b,i = 0; i < M; i++) {
+        //inf >> u >> v >> b;
+        cin >> u >> v >> b;
+
+        if (b == 1) {
+            adj[u][v] = 0;
+            adj[v][u] = 0;
+        }
+        else {
+            adj[u][v] = 0;
+            adj[v][u] = 1;
+        }
+    }
+    Floyd();
+
+    //inf >> k;
+    cin >> k;
+
+    for (int s,e,i = 0; i < k; i++) {
+        //inf >> s >> e;
+        cin >> s >> e;
+
+        printf("%d\n", adj[s][e]);
+    }
+
+
+    return 0;
+}

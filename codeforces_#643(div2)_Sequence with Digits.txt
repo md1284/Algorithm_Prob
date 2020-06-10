@@ -1,0 +1,48 @@
+#include <iostream>
+#include <algorithm>
+#include <fstream>
+
+using namespace std;
+
+typedef long long ll;
+
+int T;
+
+ll add(ll a) {
+    int mi = 10, ma = -1;
+
+    while (a > 0) {
+        mi = min(mi, (int)(a % 10));
+        ma = max(ma, (int)(a % 10));
+        a /= 10;
+    }
+
+    return (ll)mi * (ll)ma;
+}
+
+int main(void) {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
+    fstream inf("prob.txt");
+    //inf >> T;
+    cin >> T;
+
+    for (int i = 0; i < T; i++) {
+        ll a, k, ad;
+        //inf >> a >> k;
+        cin >> a >> k;
+
+        k--;
+        while (k--) {
+            ad = add(a);
+
+            if (ad == 0)
+                break;
+            else
+                a += ad;
+        }
+        printf("%lld\n", a);
+    }
+
+    return 0;
+}
