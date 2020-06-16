@@ -1,0 +1,39 @@
+#include <iostream>
+#include <algorithm>
+#include <fstream>
+
+using namespace std;
+
+typedef long long ll;
+
+const int S = 5e5;
+int a, b, c, d;
+int cnt[3*S + 5];
+
+int main(void) {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
+    //fstream inf("prob.txt");
+    //inf >> a >> b >> c >> d;
+    cin >> a >> b >> c >> d;
+
+    for (int x = a; x <= b; x++) {
+        cnt[x + b]++;
+        cnt[x + c + 1]--;
+    }
+    for (int i = a+b; i <= b+c+1; i++)
+        cnt[i + 1] += cnt[i];
+    
+    ll ret = 0;
+    for (int i = a+b; i <= b+c+1; i++) {
+        if (c < i) {
+            if (d < i)
+                ret += (ll)cnt[i] * ((ll)d - c + 1);
+            else
+                ret += (ll)cnt[i] * ((ll)i - c);
+        }
+    }
+    printf("%lld", ret);
+
+    return 0;
+}
