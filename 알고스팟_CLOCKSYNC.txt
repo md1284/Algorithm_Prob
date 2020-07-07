@@ -1,68 +1,81 @@
-#include <stdio.h>
-#include <vector>
+#include <iostream>
+#include <algorithm>
+#include <fstream>
 
 using namespace std;
 
 const int INF = 987654321;
-
 int c;
-bool connect[10][16] = {
-    {1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 ,0 ,0, 0, 0},
-    {0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1 ,0 ,0, 0, 0},
-    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0 ,0 ,0, 1, 1},
-    {1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0 ,0 ,0, 0, 0},
-    {0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0 ,1 ,0, 0, 0},
-    {1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 ,0 ,0, 1, 1},
-    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0 ,0 ,0, 1, 1},
-    {0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0 ,0 ,0, 1, 1},
-    {0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0 ,0 ,0, 0, 0},
-    {0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0 ,0 ,1, 0, 0}
+int clo[16];
+int con[10][6] = {
+    {3, 0,1,2},
+    {4, 3,7,9,11},
+    {4, 4,10,14,15},
+    {5, 0,4,5,6,7},
+    {5, 6,7,8,10,12},
+    {4, 0,2,14,15},
+    {3, 3,14,15},
+    {5, 4,5,7,14,15},
+    {5, 1,2,3,4,5},
+    {5, 3,4,5,9,13}
 };
-int clock[16];
 
-bool check(int clock[]) {
-    for(int i = 0; i<16; i++) {
-        if(clock[i] != 0)
+bool check() {
+    for (int i = 0; i < 16; i++) {
+        if (clo[i] != 0)
             return false;
     }
     return true;
 }
 
-void moveclock(int idx, int clock[]) {
-    for(int i = 0; i<16; i++) {
-        if(connect[idx][i]) {
-            clock[i] += 3;
-            clock[i] %= 12;
-        }
+void rotate(int index) {
+    int s = con[index][0];
+
+    for (int i = 1; i <= s; i++) {
+        int cur = con[index][i];
+
+        clo[cur] += 3;
+        clo[cur] %= 12;
     }
 }
 
-int solve(int idx, int clock[]) {
-    if(idx == 10) return check(clock) == true ? 0 : INF;
-    
+int solve(int index, int cnt) {
+    if (index == 10 && check() == true)
+        return cnt;
+    else if (index == 10)
+        return INF;
+
     int ret = INF;
-    for(int cnt = 0; cnt<4; cnt++) {
-        ret = min(ret, cnt + solve(idx + 1, clock));
-        moveclock(idx, clock);
+    for (int i = 0; i < 4; i++) {
+        if (check() == true)
+            ret = min(ret, cnt + i % 4);
+
+        ret = min(ret, solve(index + 1, cnt + i % 4));
+        rotate(index);
     }
     return ret;
 }
 
+int main(void) {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
+    //fstream inf("prob.txt");
+    //inf >> c;
+    cin >> c;
 
-int main() {
-    scanf("%d", &c);
-    
-    for(int i = 0; i<c; i++) {
-        for(int j = 0; j<16; j++) {
-            scanf("%d", &clock[j]);
-            clock[j] = clock[j]%12;
+    for (int i = 0; i < c; i++) {
+        for (int val, j = 0; j < 16; j++) {
+            //inf >> val;
+            cin >> val;
+
+            clo[j] = val % 12;
         }
-        
-        int sol = solve(0, clock);
-        if(sol == INF)
+        int ret = solve(0, 0);
+
+        if (ret == INF)
             printf("-1\n");
         else
-            printf("%d\n", sol);
+            printf("%d\n", solve(0, 0));
     }
 
     return 0;

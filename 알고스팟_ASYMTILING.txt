@@ -1,44 +1,61 @@
 #include <iostream>
-#include <vector>
 #include <algorithm>
-#include <string.h>
+#include <fstream>
 
 using namespace std;
 
-const int MOD = 1000000007;
-int c, n;
-int cache[101];
+typedef long long ll;
 
-int solve(int index) {
-	if(index <= 1)	return 1;
-	
-	int& ret = cache[index];
-	if(ret != -1)	return ret;
-	
-	return ret = (solve(index-1) + solve(index-2))%MOD;
+const int mod = 1e9 + 7;
+int c, n;
+ll DP[105];
+
+ll solve() {
+    for (int i = 0; i <= n; i++)
+        DP[i] = 0;
+    DP[0] = 1;
+    DP[1] = 1;
+    DP[2] = 1;
+
+    for (int i = 1; i <= n; i++) {
+        DP[i + 1] += DP[i];
+        DP[i + 2] += DP[i];
+
+        DP[i + 1] %= mod;
+        DP[i + 2] %= mod;
+        //printf("i:%d update: DP[%d]=%d, DP[%d]=%d\n", i, i + 1, DP[i + 1], i + 2, DP[i + 2]);
+    }
+
+    ll ret;
+    if (n & 1) {
+        ret = DP[n] - DP[n / 2];
+        if (ret < 0)
+            ret += mod;
+    }
+    else {
+        ret = DP[n] - DP[n / 2];
+        if (ret < 0)
+            ret += mod;
+        ret -= DP[n / 2 - 1];
+        if (ret < 0)
+            ret += mod;
+    }
+    return ret;
 }
 
+int main(void) {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
+    //fstream inf("prob.txt");
+    //inf >> c;
+    cin >> c;
 
-int main() {
-	cin >> c;
-	
-	for(int i = 0; i<c; i++) {		
-		cin >> n;
-		memset(cache, -1, sizeof(cache));
+    for (int i = 0; i < c; i++) {
+        //inf >> n;
+        cin >> n;
 
-		if(n%2 == 0) {
-			int ret = solve(n) - solve(n/2);
-			if(ret < 0)	ret += MOD;
-			ret -= solve(n/2 - 1);
-			if(ret < 0)	ret += MOD;
-			cout << ret << endl;
-		}
-		else {
-			int ret = solve(n) - solve(n/2);
-			if(ret < 0)	ret += MOD;
-			cout << ret << endl;
-		}
-	}
-	
-	return 0;
+        printf("%lld\n", solve());
+    }
+
+    return 0;
 }

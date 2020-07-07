@@ -1,48 +1,69 @@
 #include <iostream>
-#include <vector>
 #include <algorithm>
-#include <string.h>
+#include <fstream>
 
 using namespace std;
 
-const int MOD = 10000000;
-int c, n;
-int cache[101][101];
+typedef long long ll;
 
-int solve(int index, int prev) {
-	if(index == 0)	return 1;
-	
-	int& ret = cache[index][prev];
-	if(ret != -1)	return ret;
-	
-	ret = 0;
-	
-	if(prev == 0) {
-		for(int i = 1; i<=index; i++)
-			ret += solve(index - i, i)%MOD;
-	}
-	else {
-		for(int i = 1; i<=index; i++) {
-			int cand = prev + i - 1;
-			cand = (cand * solve(index - i, i))%MOD;
-			
-			ret += cand;
-			ret %= MOD;
-		}
-	}
-	
-	return ret%MOD;
+const int mod = 1e7;
+int c, n;
+int DP[101][101];
+
+ll solve(int n) {
+    ll ret = 0;
+
+    if (DP[n][n] != 0) {
+        for (int j = 1; j <= n; j++) {
+            ret += DP[n][j];
+            if (ret >= mod)
+                ret %= mod;
+        }
+        return ret;
+    }
+
+    for (int i = 1; i <= n; i++) {
+        for (int j = 1; j <= n; j++)
+            DP[i][j] = 0;
+        DP[i][i] = 1;
+    }
+
+    for (int i = 1; i <= n; i++) {
+        for (int j = 1; j <= i; j++) {
+            for (int k = 1; k <= i-j; k++) {
+                DP[i][j] += DP[i - j][k] * (k + j - 1);
+
+                if (DP[i][j] >= mod)
+                    DP[i][j] %= mod;
+
+                //printf("update DP[%d][%d]: %d, DP[%d][%d]: %d added\n",
+                //    i, j, DP[i][j], i - j, k, DP[i - j][k]);
+            }
+        }
+    }
+
+    for (int j = 1; j <= n; j++) {
+        ret += DP[n][j];
+        if (ret >= mod)
+            ret %= mod;
+    }
+    return ret;
 }
 
-int main() {
-	cin >> c;
-	
-	for(int i = 0; i<c; i++) {		
-		cin >> n;
-		memset(cache, -1, sizeof(cache));
-		
-		cout << solve(n, 0) << endl;
-	}
-	
-	return 0;
+int main(void) {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
+    //fstream inf("prob.txt");
+    //inf >> c;
+    cin >> c;
+
+    solve(100);
+    for (int i = 0; i < c; i++) {
+        //inf >> n;
+        cin >> n;
+
+        printf("%lld\n", solve(n));
+    }
+
+    return 0;
 }

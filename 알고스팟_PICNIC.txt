@@ -1,57 +1,81 @@
-#include <stdio.h>
+#include <iostream>
 #include <vector>
+#include <cstring>
+#include <fstream>
 
 using namespace std;
 
 int c, n, m;
-int areFriend[11][11];
-int taken[11];
+vector<int> f[11];
+bool visited[11];
 
-int solve(int idx) {
-    int target = -1;
-    for(int i = idx; i<n; i++) {
-        if(taken[i] == 0) {
-            target = i;
-            break;
-        }
-    }
-    
-    if(target == -1)    return 1;
-    
+int solve(int cur) {
     int ret = 0;
-    for(int i = target+1; i<n; i++) {
-        if(areFriend[target][i] && !taken[i]) {
-            taken[target] = taken[i] = 1;
-            ret += solve(target+1);
-            taken[target] = taken[i] = 0;
+    visited[cur] = true;
+    bool np = true;
+
+    for (int i = 0; i < f[cur].size(); i++) {
+        int pr = f[cur][i];
+
+        if (visited[pr] == true)
+            continue;
+
+        np = false;
+        visited[pr] = true;
+
+        bool done = true;
+        for (int i = 0; i < n; i++) {
+            if (visited[i] == false)
+                done = false;
         }
+        if (done == true) {
+            visited[cur] = false;
+            visited[pr] = false;
+            return 1;
+        }
+
+        int next;
+        for (int j = 0; j < n; j++) {
+            if (visited[j] == false) {
+                next = j;
+                break;
+            }
+        }
+
+        ret += solve(next);
+        visited[pr] = false;
     }
-    
+    visited[cur] = false;
+
+    if (np == true)
+        return 0;
+
     return ret;
 }
 
-void clear(void) {
-    for(int i = 0; i<11; i++) {
-        for(int j = 0; j<11; j++) {
-            areFriend[i][j] = 0;
-        }
-        taken[i] = 0;
-    }
-}
+int main(void) {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
+    //fstream inf("prob.txt");
+    //inf >> c;
+    cin >> c;
 
-int main() {
-    scanf("%d", &c);
-    
-    for(int i = 0; i<c; i++) {
-        scanf("%d %d", &n, &m);
-        for(int j = 0; j<m; j++) {
-            int a, b;
-            scanf("%d %d", &a, &b);
-            areFriend[a][b] = 1;
-            areFriend[b][a] = 1;
+    for (int i = 0; i < c; i++) {
+        //inf >> n >> m;
+        cin >> n >> m;
+
+        for (int j = 0; j < n; j++)
+            f[j].clear();
+
+        for (int a,b,j = 0; j < m; j++) {
+            //inf >> a >> b;
+            cin >> a >> b;
+
+            f[a].push_back(b);
+            f[b].push_back(a);
         }
+        memset(visited, 0, sizeof(visited));
         printf("%d\n", solve(0));
-        clear();
     }
 
     return 0;

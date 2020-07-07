@@ -1,87 +1,91 @@
-#include <stdio.h>
-#include <vector>
+#include <iostream>
+#include <fstream>
 
 using namespace std;
 
 int c, h, w;
-int board[21][21];
-int cover[4][3][2] = {
-    { {0, 0}, {1, 0}, {1, -1} },
-    { {0, 0}, {1, 0}, {1, 1} },
-    { {0, 0}, {1, 0}, {0, 1} },
-    { {0, 0}, {0, 1}, {1, 1} }
+char mp[21][21];
+int mv[4][3][2] = {
+{{0,0}, {0,1}, {1,0}},
+{{0,0}, {1,0}, {1,-1}},
+{{0,0}, {0,1}, {1,1}},
+{{0,0}, {1,0}, {1,1}}
 };
 
-bool check(int y, int x, int type, int delta) {
-    int dx, dy;
-    bool inspection = true;
-    
-    for(int i = 0; i<3; i++) {
-        dx = x + cover[type][i][1];
-        dy = y + cover[type][i][0];
-        
-        if(dx < 0 || w <= dx || dy < 0 || h <= dy)
-            inspection = false;
-        else if((board[dy][dx] += delta) > 1)
-            inspection = false;
-    }
-    return inspection;
-}
+int solve() {
+    bool flag = false;
+    int cy, cx;
+    int ret = 0;
 
-int solve(void) {
-    int avx = -1, avy = -1;
-    for(int i = 0; i<h; i++) {
-        for(int j = 0; j<w; j++) {
-            if(board[i][j] == 0) {
-                avy = i;
-                avx = j;
+    for (int y = 1; y <= h; y++) {
+        for (int x = 1; x <= w; x++) {
+            if (mp[y][x] == '.') {
+                flag = true;
+                cy = y;
+                cx = x;
                 break;
             }
         }
-        if(avx != -1 && avy != -1)
+        if (flag == true)
             break;
     }
-    
-    if(avx == -1 && avy == -1)
+
+    if (flag == false)
         return 1;
+
+    for (int type = 0; type < 4; type++) {
+        bool check = false;
         
-    int ret = 0;
-    for(int i = 0; i<4; i++) {
-        if(check(avy, avx, i, 1))
-            ret += solve();
-        check(avy, avx, i, -1);
+        for (int i = 0; i < 3; i++) {
+            int ny = cy + mv[type][i][0];
+            int nx = cx + mv[type][i][1];
+
+            if (ny < 1 || h < ny || nx < 1 || w < nx || mp[ny][nx] == '#') {
+                check = true;
+                break;
+            }
+        }
+
+        if (check == true)
+            continue;
+
+        for (int i = 0; i < 3; i++) {
+            int ny = cy + mv[type][i][0];
+            int nx = cx + mv[type][i][1];
+
+            mp[ny][nx] = '#';
+        }
+        ret += solve();
+        for (int i = 0; i < 3; i++) {
+            int ny = cy + mv[type][i][0];
+            int nx = cx + mv[type][i][1];
+
+            mp[ny][nx] = '.';
+        }
     }
-    
+
     return ret;
 }
 
-void clear(void) {
-    for(int i = 0; i<21; i++) {
-        for(int j = 0; j<21; j++)
-            board[i][j] = 0;
-    }
-}
+int main(void) {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
+    //fstream inf("prob.txt");
+    //inf >> c;
+    cin >> c;
 
+    for (int i = 0; i < c; i++) {
+        //inf >> h >> w;
+        cin >> h >> w;
 
-int main() {
-    scanf("%d", &c);
-    for(int i = 0; i<c; i++) {
-        scanf("%d %d", &h, &w);
-        
-        for(int j = 0; j<h; j++) {
-            for(int k = 0; k<w; k++) {
-                getchar();
-                char ch;
-                scanf("%c", &ch);
-                
-                if(ch == '#')   board[j][k] = 1;
+        for (int y = 1; y <= h; y++) {
+            for (int x = 1; x <= w; x++) {
+                //inf >> mp[y][x];
+                cin >> mp[y][x];
             }
         }
-        
         printf("%d\n", solve());
-        clear();
     }
-
 
     return 0;
 }

@@ -1,68 +1,73 @@
 #include <iostream>
-#include <vector>
 #include <algorithm>
-#include <string.h>
+#include <fstream>
 
 using namespace std;
 
 const int INF = 987654321;
-int c, n, s;
-int sum[101], sqsum[101];
-int seq[101];
-int cache[101][11];
+int c, N, S;
+int d[101], psum[101], ppsum[101], DP[101][11];
 
-void prev() {
-	sum[0] = seq[0];
-	sqsum[0] = seq[0] * seq[0];
-	
-	for(int i = 1; i<n; i++) {
-		sum[i] = sum[i-1] + seq[i];
-		sqsum[i] = sqsum[i-1] + seq[i] * seq[i];
-	}
+int calc(int a, int b) {
+    double aver = 1.0 * (psum[b] - psum[a - 1]) / (b - a + 1);
+    int p;
+
+    if (aver - (int)aver < 0.5)
+        p = (int)aver;
+    else
+        p = (int)(aver + 1);
+
+    return ppsum[b] - ppsum[a - 1] - 2 * 
+        (psum[b] - psum[a - 1]) * p + p * p * (b - a + 1);
 }
 
-int error(int a, int b) {
-	int subsum = sum[b] - (a == 0 ? 0 : sum[a-1]);
-	int subsqsum = sqsum[b] - (a == 0 ? 0 : sqsum[a-1]);
-	int m = int(0.5 + double(subsum) / (b - a + 1));
-	int ret = subsqsum - 2 * m * subsum + (b - a + 1) * m * m;
-	
-	return ret;
+int solve() {
+    sort(d, d + N + 1);
+
+    if (N <= S)
+        return 0;
+
+    for (int i = 1; i <= N; i++) {
+        psum[i] = psum[i - 1] + d[i];
+        ppsum[i] = ppsum[i - 1] + d[i] * d[i];
+    }
+
+    for (int i = 1; i <= N; i++) {
+        DP[i][1] = calc(1, i);
+        for (int j = 2; j <= S; j++) {
+            DP[i][j] = INF;
+        }
+    }
+
+    for (int j = 2; j <= S; j++) {
+        for (int i = 1; i <= N; i++) {
+            for (int k = 1; k < i; k++) {
+                DP[i][j] = min(DP[i][j], DP[k][j - 1] + calc(k + 1, i));
+                //printf("DP[%d][%d]: %d, ab:%d %d, calc: %d\t\tDP[%d][%d]: %d\n", 
+                //    k, j-1, DP[k][j-1], k+1, i, calc(k + 1, i), i, j, DP[i][j]);
+            }
+        }
+    }
+    return DP[N][S];
 }
 
+int main(void) {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
+    //fstream inf("prob.txt");
+    //inf >> c;
+    cin >> c;
 
-int solve(int index, int s) {
-	if(index == n)	return 0;
-	if(s == 0)	return INF;
-	
-	int& ret = cache[index][s];
-	if(ret != -1)	return ret;
-	
-	ret = INF;
-	
-	for(int i = index; i<n; i++)
-		ret = min(ret, error(index, i) + solve(i+1, s-1));
-	
-	return ret;
-}
+    for (int i = 0; i < c; i++) {
+        //inf >> N >> S;
+        cin >> N >> S;
 
+        for (int j = 1; j <= N; j++) {
+            //inf >> d[j];
+            cin >> d[j];
+        }
+        printf("%d\n", solve());
+    }
 
-int main() {
-	cin >> c;
-	
-	for(int i = 0; i<c; i++) {		
-		cin >> n >> s;
-		memset(cache, -1, sizeof(cache));
-		memset(seq, 0, sizeof(seq));
-		
-		for(int j = 0; j<n; j++)
-			cin >> seq[j];
-	
-		sort(seq, seq + n);
-		prev();
-	
-		cout << solve(0, s) << endl;
-	}
-		
-	return 0;
+    return 0;
 }

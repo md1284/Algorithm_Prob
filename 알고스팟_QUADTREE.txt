@@ -1,36 +1,44 @@
 #include <iostream>
+#include <fstream>
 
 using namespace std;
 
 int c;
-string str;
+string s;
 
-string solve(string::iterator& it) {
-    char head = *it;
-    it++;
-    
-    if(head == 'b' || head =='w')
-        return string(1, head);
-    
-    string upperLeft = solve(it);
-    string upperRight = solve(it);
-    string lowerLeft=  solve(it);
-    string lowerRight = solve(it);
-    
-    return string("x") + lowerLeft + lowerRight + upperLeft + upperRight;
+string solve(int index) {
+    string ret = "";
+
+    if (s[index] != 'x') {
+        ret += s[index];
+        return ret;
+    }
+    else {
+        ret += s[index];
+
+        string s1 = solve(index + 1);
+        string s2 = solve(index + 1 + s1.size());
+        string s3 = solve(index + 1 + s1.size() + s2.size());
+        string s4 = solve(index + 1 + s1.size() + s2.size() + s3.size());
+
+        ret += s3 + s4 + s1 + s2;
+    }
+    return ret;
 }
 
+int main(void) {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
+    //fstream inf("prob.txt");
+    //inf >> c;
+    cin >> c;
 
-int main() {
-    scanf("%d", &c);
-    
-    for(int i = 0; i<c; i++) {
-        cin >> str;
-        string::iterator it = str.begin();
-        cout << solve(it) << endl;
+    for (int i = 0; i < c; i++) {
+        //inf >> s;
+        cin >> s;
+
+        cout << solve(0) << endl;
     }
-    
-
 
     return 0;
 }

@@ -1,52 +1,50 @@
 #include <iostream>
+#include <stack>
+#include <algorithm>
+#include <fstream>
 
 using namespace std;
 
-int c, n;
-int fence[20001];
+int c, N;
+int h[20002];
 
-int solve(int left, int right) {
-    if(left >= right)    return fence[left];
-    
-    int mid = (left+right)/2;
-    int ret = max(solve(left, mid), solve(mid+1, right));
-    int curleft = left;
-    int curright = right;
-    int height = 0;
-    
-    left = mid;
-    right = mid + 1;
-    height = min(fence[left], fence[right]);
-    ret = max(ret, height*2);
-        
-    while(left > curleft || right < curright) {
-        if(right < curright && (left == curleft || fence[left-1] < fence[right+1])) {
-            right++;
-            height = min(height, fence[right]);
+int solve() {
+    stack<int> st;
+    h[0] = 0;
+    h[N + 1] = 0;
+    st.push(0);
+
+    int ret = 0;
+    for (int i = 1; i <= N + 1; i++) {
+        if (h[i] < h[st.top()]) {
+            while (!st.empty() && h[i] < h[st.top()]) {
+                int ch = h[st.top()];
+                st.pop();
+
+                ret = max(ret, (i - st.top() - 1) * ch);
+            }
         }
-        else {
-            left--;
-            height = min(height, fence[left]);
-        }
-        ret = max(height * (right-left+1), ret);
+        st.push(i);
     }
-    
     return ret;
 }
 
+int main(void) {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
+    //fstream inf("prob.txt");
+    //inf >> c;
+    cin >> c;
 
+    for (int i = 0; i < c; i++) {
+        //inf >> N;
+        cin >> N;
 
-int main() {
-    scanf("%d", &c);
-    
-    for(int i = 0; i<c; i++) {
-        scanf("%d", &n);
-        
-        for(int j = 0; j<n; j++) 
-            scanf("%d", &fence[j]);
-    
-        printf("%d\n", solve(0, n-1));
+        for (int j = 1; j <= N; j++) {
+            //inf >> h[j];
+            cin >> h[j];
+        }
+        printf("%d\n", solve());
     }
-    
     return 0;
 }
