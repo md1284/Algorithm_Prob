@@ -1,0 +1,91 @@
+#include <iostream>
+#include <algorithm>
+#include <fstream>
+
+using namespace std;
+
+struct Maxp {
+	int mm;
+	int ml;
+	int mr;
+};
+
+const int MX = 1e5, INF = 987654321;
+int N, M;
+int a[MX + 5], psum[MX + 5];
+Maxp Tree[4 * MX + 5];
+
+void init(int b, int s, int e) {
+	if (s == e) {
+		Tree[b] = { a[s], a[s], a[s] };
+		return;
+	}
+
+	int mid = (s + e) / 2;
+	init(b * 2, s, mid);
+	init(b * 2 + 1, mid + 1, e);
+
+	int left = -INF;
+	for (int sum = 0, i = s; i <= e; i++) {
+		sum += a[i];
+		left = max(left, sum);
+	}
+	int right = -INF;
+	for (int sum = 0, i = e; i >= s; i--) {
+		sum += a[i];
+		right = max(right, sum);
+	}
+
+	Tree[b].mm = max(Tree[b * 2].mr + Tree[b * 2 + 1].ml, 
+		max(Tree[b * 2].mm, Tree[b * 2 + 1].mm));
+
+	Tree[b].ml = left;
+	Tree[b].mr = right;
+}
+
+Maxp get(int b, int s, int e, int l, int r) {
+	if (r < s || e < l)
+		return { -INF, -INF, -INF };
+
+	if (l <= s && e <= r)
+		return Tree[b];
+
+	int mid = (s + e) / 2;
+	Maxp left = get(b * 2, s, mid, l, r);
+	Maxp right = get(b * 2 + 1, mid + 1, e, l, r);
+
+	int mm = max(left.mr + right.ml, max(left.mm, right.mm));
+	int ml = max(left.ml, psum[mid] - psum[s - 1] + right.ml);
+	int mr = max(right.mr, psum[e] - psum[mid] + left.mr);
+
+	return { mm, ml, mr };
+}
+
+int main(void) {
+	ios_base::sync_with_stdio(false);
+	cin.tie(NULL); cout.tie(NULL);
+	//fstream inf("prob.txt");
+	//inf >> N;
+	cin >> N;
+
+	for (int i = 1; i <= N; i++) {
+		//inf >> a[i];
+		cin >> a[i];
+		psum[i] = psum[i - 1] + a[i];
+	}
+	init(1, 1, N);
+
+	//inf >> M;
+	cin >> M;
+
+	Maxp ret;
+	for (int a,b,i = 0; i < M; i++) {
+		//inf >> a >> b;
+		cin >> a >> b;
+
+		ret = get(1, 1, N, a, b);
+		printf("%d\n", ret.mm);
+	}
+
+	return 0;
+}

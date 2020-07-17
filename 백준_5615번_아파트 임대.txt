@@ -1,0 +1,73 @@
+#include <iostream>
+#include <vector>
+#include <fstream>
+
+using namespace std;
+
+typedef unsigned long long ll;
+
+int N;
+vector<ll> alist = { 2, 3, 5, 7, 11};
+
+ll power(ll a, ll b, ll m) {
+	ll ret = 1;
+	for (; b > 0; b >>= 1, a = a * a % m) {
+		if (b & 1)
+			ret = ret * a % m;
+	}
+	return ret;
+}
+
+bool miller_rabin(ll n, ll a) {
+	ll d = n - 1;
+
+	while (d % 2 == 0) {
+		if (power(a, d, n) == n - 1)
+			return true;
+		d = d >> 1;
+	}
+	ll tmp = power(a, d, n);
+	return tmp == n - 1 || tmp == 1;
+}
+
+bool isPrime(ll n) {
+	if (n <= 1)
+		return false;
+
+	if (n <= 100) {
+		for (ll i = 2; i * i <= n; i++) {
+			if (n % i == 0)
+				return false;
+		}
+		return true;
+	}
+
+	for (int i = 0; i < alist.size(); i++) {
+		ll a = alist[i];
+
+		if (miller_rabin(n, a) == false)
+			return false;
+	}
+	return true;
+}
+
+int main(void) {
+	ios_base::sync_with_stdio(false);
+	cin.tie(NULL); cout.tie(NULL);
+	//fstream inf("prob.txt");
+	//inf >> N;
+	cin >> N;
+
+	int ret = 0;
+	for (int i = 0; i < N; i++) {
+		ll s;
+		//inf >> s;
+		cin >> s;
+
+		if (isPrime(2 * s + 1) == true)
+			ret++;
+	}
+	printf("%d", ret);
+	
+    return 0;
+}

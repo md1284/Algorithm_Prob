@@ -1,0 +1,52 @@
+#include <algorithm>
+#include <iostream>
+
+//let maximum depth of recursive function getA is k
+//then almost T = 2*2^k calls
+//and for smaller part calculate all the values
+//the maximum n which required at kth recursion is
+//at N = 10^13, P=Q=2, X=Y=0 => N/2^k
+//so, precalculate 2N/T values (in O(2N/T) with consequtive calculation)
+//then recurse k time so O(T)
+//so at T = sqrt(2N) = sqrt(2*10^13) ~= 4*10^6 it's the fastest
+//and 2^22 is about 4*10^6 so choose k = 21
+
+#define MAXN 10'000'000'000'000
+#define MaxDepth 21
+#define PreCalc 4'768'372
+using ll = long long;
+
+ll arr[PreCalc + 1];
+
+int P, Q, X, Y;
+
+ll preGetA(int n)
+{
+	if (n <= 0) return 1;
+	if (arr[n] != 0) return arr[n];
+	return arr[n] = preGetA(n / P - X) + preGetA(n / Q - Y);
+}
+
+void init()
+{
+	for (int i = 1; i <= PreCalc; i++)
+		preGetA(i);
+}
+
+ll getA(ll n) {
+	if (n <= 0) return 1;
+	if (n <= PreCalc) return arr[n];
+	return getA(n / P - X) + getA(n / Q - Y);
+}
+
+int main()
+{
+	ll N;
+	std::ios_base::sync_with_stdio(false);
+	std::cin.tie(0); std::cout.tie(0);
+
+	std::cin >> N >> P >> Q >> X >> Y;
+	init();
+	std::cout << getA(N);
+	return 0;
+}
