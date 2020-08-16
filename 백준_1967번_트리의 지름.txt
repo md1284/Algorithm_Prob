@@ -1,72 +1,63 @@
 #include <iostream>
 #include <vector>
-#include <windows.h>
+#include <algorithm>
+#include <cstring>
+#include <fstream>
 
 using namespace std;
 
-typedef struct _edge
-{
-	int v, c;
-} edge;
+typedef pair<int, int> pii;
 
-vector<edge> G[10001];
-int visit[10001];
-int maxi = 0;
-int sum = 0;
-int indx = 0;
+const int S = 1e4;
+int N;
+int s, d[S + 5];
+vector<pii> adj[S + 5];
+bool visited[S + 5];
 
-void DFS(int first)
-{
-	if (visit[first] == 0)
-	{
-		if (maxi < sum)
-		{
-			indx = first;
-			maxi = sum;
-		}
-	}
+void dfs(int here, int dist) {
+    visited[here] = true;
+    d[here] = dist;
 
-	visit[first] = 1;
-		
-	for (int i = 0; i < G[first].size(); i++)
-	{
-		if (visit[G[first][i].v] == 0)
-		{
-			sum += G[first][i].c;
-			DFS(G[first][i].v);
-			sum -= G[first][i].c;
-		}
-	}
+    for (int i = 0; i < adj[here].size(); i++) {
+        int there = adj[here][i].first;
+        int cost = adj[here][i].second;
+
+        if (visited[there] == true)
+            continue;
+
+        dfs(there, dist + cost);
+    }
 }
 
-int main(void)
-{
-	int n;
-	scanf("%d", &n);
 
-	for (int i = 1; i < n; i++)
-	{
-		int idx, a, b;
-		scanf("%d %d %d", &idx, &a, &b);
+int main(void) {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
+    //fstream inf("prob.txt");
+    //inf >> N;
+    cin >> N;
 
-		edge temp;
-		temp.v = a;
-		temp.c = b;
-		G[idx].push_back(temp);
-		temp.v = idx;
-		G[a].push_back(temp);
-	}
+    for (int a, b, w, i = 0; i < N - 1; i++) {
+        //inf >> a >> b >> w;
+        cin >> a >> b >> w;
 
-	DFS(1);
-	sum = 0;
-	maxi = 0;
+        adj[a].push_back({ b, w });
+        adj[b].push_back({ a, w });
+    }
+    dfs(1, 0);
+    for (int dist = 0, i = 1; i <= N; i++) {
+        if (dist <= d[i]) {
+            s = i;
+            dist = d[i];
+        }
+    }
+    memset(visited, 0, sizeof(visited));
+    dfs(s, 0);
 
-	for (int i = 1; i <= n; i++)
-		visit[i] = 0;
+    int ret = 0;
+    for (int i = 1; i <= N; i++)
+        ret = max(ret, d[i]);
+    printf("%d", ret);
 
-	DFS(indx);
-	printf("%d", maxi);
-	
-	system("pause");
-	return 0;
+    return 0;
 }

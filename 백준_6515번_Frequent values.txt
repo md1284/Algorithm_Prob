@@ -1,0 +1,95 @@
+#include <iostream>
+#include <stack>
+#include <algorithm>
+#include <fstream>
+
+using namespace std;
+
+const int S = 1e5;
+int N, Q;
+int a[S + 5], Tree[4 * S + 5];
+pair<int, int> rng[S + 5];
+
+void prev() {
+    stack<int> st;
+    int s = 1, e = 1;
+    while (e <= N) {
+        if (a[s] == a[e]) {
+            st.push(e++);
+            continue;
+        }
+
+        while (!st.empty()) {
+            int t = st.top();
+            st.pop();
+            rng[t] = { s, e - 1 };
+        }
+        s = e;
+    }
+    while (!st.empty()) {
+        int t = st.top();
+        st.pop();
+        rng[t] = { s, e - 1 };
+    }
+}
+
+void init(int b, int s, int e) {
+    if (s == e) {
+        Tree[b] = 1;
+        return;
+    }
+
+    int mid = (s + e) / 2;
+    init(b * 2, s, mid);
+    init(b * 2 + 1, mid + 1, e);
+    Tree[b] = max(Tree[b * 2], Tree[b * 2 + 1]);
+
+    if (a[mid] == a[mid + 1])
+        Tree[b] = max(Tree[b], (min(e, rng[mid].second) - max(s, rng[mid].first)) + 1);
+}
+
+int get(int b, int s, int e, int l, int r) {
+    if (r < s || e < l)
+        return 0;
+
+    if (l <= s && e <= r)
+        return Tree[b];
+
+    int mid = (s + e) / 2;
+    int left = get(b * 2, s, mid, l, r), right = get(b * 2 + 1, mid + 1, e, l, r);
+    int ret = max(left, right);
+
+    if (a[mid] == a[mid + 1] && left != 0 && right != 0)
+        ret = max(ret, (min(r, rng[mid].second) - max(l, rng[mid].first)) + 1);
+
+    return ret;
+}
+
+int main(void) {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
+    //fstream inf("prob.txt");
+    
+    while (true) {
+        //inf >> N;
+        cin >> N;
+        if (N == 0)
+            break;
+        //inf >> Q;
+        cin >> Q;
+        for (int i = 1; i <= N; i++) {
+            //inf >> a[i];
+            cin >> a[i];
+        }
+
+        prev();
+        init(1, 1, N);
+        for (int l, r, i = 0; i < Q; i++) {
+            //inf >> l >> r;
+            cin >> l >> r;
+            printf("%d\n", get(1, 1, N, l, r));
+        }
+    }
+
+    return 0;
+}
