@@ -1,0 +1,36 @@
+#include <iostream>
+#include <algorithm>
+#include <fstream>
+
+using namespace std;
+
+const int S = 1e5, INF = 1e9;
+int N, M;
+int psum[S + 5];
+
+int solve() {
+    int ret = -INF, minp = 0;
+
+    for (int i = M; i <= N; i++) {
+        minp = min(minp, psum[i - M]);
+        ret = max(ret, psum[i] - minp);
+    }
+    return max(ret, 0);
+}
+
+int main(void) {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
+    //fstream inf("prob.txt");
+    //inf >> N >> M;
+    cin >> N >> M;
+
+    for (int i = 1; i <= N; i++) {
+        //inf >> psum[i];
+        cin >> psum[i];
+        psum[i] += psum[i - 1];
+    }
+    printf("%d", solve());
+    
+    return 0;
+}
