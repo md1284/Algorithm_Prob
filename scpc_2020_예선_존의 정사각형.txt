@@ -1,0 +1,137 @@
+#include <iostream>
+#include <vector>
+#include <map>
+#include <algorithm>
+#include <cstring>
+#include <ctime>
+#include <fstream>
+
+using namespace std;
+
+typedef long long ll;
+typedef pair<int, int> pii;
+typedef pair<pii, pii> pdii;
+
+const int S = 5e5, INF = 2e9;
+int T, N, M;
+int Tree[4 * S + 5], dp1[S + 5], dp2[S + 5];
+vector<pdii> p;
+
+bool cmp1(const pdii& a, const pdii& b) {
+    if (a.second.first == b.second.first)
+        return a.second.second > b.second.second;
+    return a.second.first < b.second.first;
+}
+
+bool cmp2(const pdii& a, const pdii& b) {
+    if (a.second.second - a.second.first == b.second.second - b.second.first)
+        return a.second.first < b.second.first;
+    return a.second.second - a.second.first < b.second.second - b.second.first;
+}
+
+void prev() {
+    for (int i = 0; i < 4 * N + 5; i++)
+        Tree[i] = INF;
+}
+
+void update(int b, int s, int e, int n, int x) {
+    if (n < s || e < n)
+        return;
+
+    if (s == e) {
+        Tree[b] = x;
+        return;
+    }
+
+    int mid = (s + e) / 2;
+    update(b * 2, s, mid, n, x);
+    update(b * 2 + 1, mid + 1, e, n, x);
+    Tree[b] = min(Tree[b * 2], Tree[b * 2 + 1]);
+}
+
+int get(int b, int s, int e, int l, int r) {
+    if (r < s || e < l)
+        return INF;
+
+    if (l <= s && e <= r)
+        return Tree[b];
+
+    int mid = (s + e) / 2;
+    return min(get(b * 2, s, mid, l, r), get(b * 2 + 1, mid + 1, e, l, r));
+}
+
+ll solve() {
+    memset(dp1, 0, sizeof(dp1));
+    memset(dp2, 0, sizeof(dp2));
+
+    prev();
+    sort(p.begin(), p.end(), cmp1);
+    for (int i = 0; i < p.size(); i++)
+        p[i].first.first = i + 1;
+    sort(p.begin(), p.end(), cmp2);
+
+    for (int i = p.size() - 1; i >= 0; i--) {
+        int idx = p[i].first.first, y = p[i].second.second;
+        int a = get(1, 1, N, idx + 1, N);
+
+        dp1[idx] = M - y;
+        if (a != INF)
+            dp1[idx] = min(dp1[idx], a - y);
+
+        update(1, 1, N, idx, y);
+    }
+
+    prev();
+    for (int i = 0; i < p.size(); i++)
+        swap(p[i].second.first, p[i].second.second);
+    sort(p.begin(), p.end(), cmp1);
+    for (int i = 0; i < p.size(); i++)
+        p[i].first.second = i + 1;
+    sort(p.begin(), p.end(), cmp2);
+
+    for (int i = p.size() - 1; i >= 0; i--) {
+        int idx = p[i].first.second, y = p[i].second.second;
+        int a = get(1, 1, N, idx + 1, N);
+
+        dp2[idx] = M - y;
+        if (a != INF)
+            dp2[idx] = min(dp2[idx], a - y);
+
+        update(1, 1, N, idx, y);
+    }
+
+    ll ret = 0;
+    for (int i = 0; i < p.size(); i++) {
+        int idx1 = p[i].first.first;
+        int idx2 = p[i].first.second;
+
+        ret += min(dp1[idx1], dp2[idx2]);
+    }
+
+    return ret;
+}
+
+int main(void) {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
+    //fstream inf("makeprob.txt");
+    //inf >> T;
+    cin >> T;
+
+    for (int i = 1; i <= T; i++) {
+        //inf >> M >> N;
+        cin >> M >> N;
+
+        p.clear();
+        for (int x, y, j = 0; j < N; j++) {
+            //inf >> x >> y;
+            cin >> x >> y;
+
+            p.push_back({ {0,0}, {x,y} });
+        }
+        printf("Case #%d\n", i);
+        printf("%lld\n", solve());
+    }
+
+    return 0;
+}

@@ -1,0 +1,66 @@
+#include <iostream>
+#include <set>
+#include <fstream>
+
+using namespace std;
+
+typedef pair<int, int> pii;
+
+int T, N;
+set<pii> st;
+
+bool solve() {
+    int prev = -1;
+    bool twin = false;
+    while (!st.empty()) {
+        set<pii>::iterator it = st.end();
+        it--;
+        
+        while (true) {
+            if ((*it).second == prev && it != st.begin())
+                it--;
+            else
+                break;
+        }
+        if ((*it).second == prev)
+            break;
+
+        prev = (*it).second;
+        pii x = (*it);
+        st.erase(it);
+        
+        x.first--;
+        if (x.first > 0)
+            st.insert(x);
+
+        twin = !twin;
+    }
+    return twin;
+}
+
+int main(void) {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
+    //fstream inf("prob.txt");
+    //inf >> T;
+    cin >> T;
+
+    for (int i = 0; i < T; i++) {
+        //inf >> N;
+        cin >> N;
+
+        st.clear();
+        for (int x, j = 0; j < N; j++) {
+            //inf >> x;
+            cin >> x;
+
+            st.insert({ x, j });
+        }
+        if (solve() == true)
+            printf("T\n");
+        else
+            printf("HL\n");
+    }
+    
+    return 0;
+}

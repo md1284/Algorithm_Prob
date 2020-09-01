@@ -1,0 +1,51 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <cmath>
+#include <fstream>
+ 
+using namespace std;
+ 
+typedef long long ll;
+ 
+int N;
+vector<int> p;
+ 
+ll solve() {
+    sort(p.begin(), p.end());
+ 
+    ll ret = 0;
+    for (int i = 0; i < p.size(); i++)
+        ret += abs(p[i] - 1);
+ 
+    for (int c = 2; c <= 1e9; c++) {
+        ll e = 0, cc = 1;
+        for (int i = 0; i < p.size(); i++) {
+            e += abs(p[i] - cc);
+            if (ret < e)
+                break;
+            cc *= c;
+        }
+        if (ret < e)
+            break;
+        ret = min(ret, e);
+    }
+    return ret;
+}
+ 
+int main(void) {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
+    //fstream inf("prob.txt");
+    //inf >> N;
+    cin >> N;
+ 
+    for (int x, i = 0; i < N; i++) {
+        //inf >> x;
+        cin >> x;
+        p.push_back(x);
+    }
+    printf("%lld", solve());
+ 
+    return 0;
+}

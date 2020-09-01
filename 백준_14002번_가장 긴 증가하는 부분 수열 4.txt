@@ -30,8 +30,7 @@ void solve() {
     printf("%d\n", ret);
     vector<int> m;
     while (dp[n] != 1) {
-        \
-            m.push_back(n);
+        m.push_back(n);
         n = rc[n];
     }
     m.push_back(n);

@@ -1,0 +1,32 @@
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
+int T, N;
+string s, w;
+
+int main(void) {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
+    //fstream inf("prob.txt");
+    //inf >> T;
+    cin >> T;
+
+    for (int i = 0; i < T; i++) {
+        //inf >> N >> s;
+        cin >> N >> s;
+
+        w = "";
+        if (s[N - 1] == '0') {
+            for (int j = 0; j < N; j++)
+                w += '0';
+        }
+        else {
+            for (int j = 0; j < N; j++)
+                w += '1';
+        }
+        cout << w << endl;
+    }
+    return 0;
+}
