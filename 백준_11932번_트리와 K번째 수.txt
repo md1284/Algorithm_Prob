@@ -1,0 +1,152 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <fstream>
+
+using namespace std;
+
+typedef long long ll;
+typedef pair<int, int> pii;
+
+struct Node {
+    int l, r;
+    int v;
+
+    Node() {
+        l = r = -1;
+        v = 0;
+    }
+};
+
+const int S = 1e5;
+int N, M;
+int wgt[S + 5], itoc[S + 5], ctoi[S + 5], d[S + 5], anc[S + 5][21];
+vector<int> adj[S + 5];
+vector<pii> pos;
+Node root[S + 5];
+Node Tree[20 * S + 5];
+int pv = 1;
+bool visited[S + 5];
+
+void update(Node& p, Node& b, int s, int e, int n) {
+    if (s == e) {
+        b.v = 1;
+        return;
+    }
+
+    int mid = (s + e) / 2;
+    if (n <= mid) {
+        if (b.l == -1)
+            b.l = pv++;
+        b.r = p.r;
+        update(Tree[p.l], Tree[b.l], s, mid, n);
+    }
+    else {
+        if (b.r == -1)
+            b.r = pv++;
+        b.l = p.l;
+        update(Tree[p.r], Tree[b.r], mid + 1, e, n);
+    }
+
+    int lft = b.l != -1 ? Tree[b.l].v : 0;
+    int rgt = b.r != -1 ? Tree[b.r].v : 0;
+    b.v = lft + rgt;
+}
+
+int get(Node& c, Node& a, Node& b, int s, int e, int k, int lc) {
+    if (s == e)
+        return s;
+
+    int mid = (s + e) / 2;
+    int d = (Tree[a.l].v + Tree[b.l].v) - 2 * (Tree[c.l].v);
+    if (s <= itoc[lc] && itoc[lc] <= mid)
+        d++;
+
+    if (d >= k)
+        return get(Tree[c.l], Tree[a.l], Tree[b.l], s, mid, k, lc);
+    else
+        return get(Tree[c.r], Tree[a.r], Tree[b.r], mid + 1, e, k - d, lc);
+}
+
+void dfs(int here, int depth) {
+    visited[here] = true;
+    d[here] = depth;
+
+    for (int i = 0; i < adj[here].size(); i++) {
+        int there = adj[here][i];
+        if (visited[there] == true)
+            continue;
+        
+        anc[there][0] = here;
+        update(root[here], root[there], 1, N, itoc[there]);
+        dfs(there, depth + 1);
+    }
+}
+
+void btup() {
+    for (int i = 1; i < 21; i++) {
+        for (int j = 1; j <= N; j++)
+            anc[j][i] = anc[anc[j][i - 1]][i - 1];
+    }
+}
+
+int lca(int a, int b) {
+    if (d[b] < d[a])
+        swap(a, b);
+
+    for (int i = 20; i >= 0; i--) {
+        if (d[a] <= d[anc[b][i]])
+            b = anc[b][i];
+    }
+    if (a == b)
+        return a;
+
+    for (int i = 20; i >= 0; i--) {
+        if (anc[a][i] != anc[b][i]) {
+            a = anc[a][i];
+            b = anc[b][i];
+        }
+    }
+    return anc[a][0];
+}
+
+int main(void) {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
+    //fstream inf("prob.txt");
+    //inf >> N >> M;
+    cin >> N >> M;
+
+    for (int i = 1; i <= N; i++) {
+        //inf >> wgt[i];
+        cin >> wgt[i];
+        pos.push_back({ wgt[i], i });
+    }
+    sort(pos.begin(), pos.end());
+    for (int i = 0; i < pos.size(); i++) {
+        itoc[pos[i].second] = i + 1;
+        ctoi[i + 1] = pos[i].second;
+    }
+
+    for (int x,y,i = 0; i < N - 1; i++) {
+        //inf >> x >> y;
+        cin >> x >> y;
+
+        adj[x].push_back(y);
+        adj[y].push_back(x);
+    }
+
+    update(root[0], root[1], 1, N, itoc[1]);
+    dfs(1, 1);
+    btup();
+
+    for (int x,y,k,i = 0; i < M; i++) {
+        //inf >> x >> y >> k;
+        cin >> x >> y >> k;
+
+        int c = lca(x, y);
+        printf("%d\n", wgt[ctoi[get(root[c], root[x], root[y], 1, N, k, c)]]);
+    }
+    
+    return 0;
+}

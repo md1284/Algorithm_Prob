@@ -1,0 +1,113 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <iomanip>
+#include <cmath>
+#include <fstream>
+
+using namespace std;
+
+typedef long long ll;
+typedef pair<ll, int> pli;
+typedef pair<double, int> pdi;
+
+int T, N;
+double dp[105], rd[105];
+vector<pli> p;
+
+bool cmp(const pli& a, const pli& b) {
+    return a > b;
+}
+
+double distx(pli a, pli b) {
+    if (a < b)
+        swap(a, b);
+    double aa = a.first, bb = b.first;
+    return sqrt((aa + bb) * (aa + bb) - (aa - bb) * (aa - bb));
+}
+
+void calc(vector<pli> &c, double dp[]) {
+    for (int i = 0; i < c.size(); i++) {
+        int idx = c[i].second;
+        if (i == 0)
+            dp[idx] = 0;
+        else {
+            for (int j = 0; j < i; j++) {
+                int idxj = c[j].second;
+                dp[idx] = max(dp[idx], dp[idxj] + distx(c[j], c[i]));
+            }
+        }
+    }
+}
+
+void solve() {
+    sort(p.begin(), p.end(), cmp);
+
+    vector<pli> c;
+    for (int i = 0; i < p.size(); i++) {
+        if (i % 2 == 0)
+            c.push_back(p[i / 2]);
+        else
+            c.push_back(p[N - (i / 2) - 1]);
+    }
+    calc(c, dp);
+    pdi mx = { 0,0 }, mi = { 1e18, 0 };
+    for (int i = 1; i <= N; i++) {
+        mx = max(mx, { dp[i], i });
+        mi = min(mi, { dp[i], i });
+    }
+    for (int i = 0; i < c.size(); i++) {
+        for (int j = i + 1; j < c.size(); j++) {
+            double ddp[101] = { 0, };
+
+            swap(c[i], c[j]);
+            calc(c, ddp);
+            pdi dmx = { 0,0 }, dmi = { 1e18, 0 };
+            for (int k = 1; k <= N; k++) {
+                dmx = max(dmx, { ddp[k], k });
+                dmi = min(dmi, { ddp[k], k });
+            }
+            if (mx.first + rd[mx.second] + rd[mi.second] > dmx.first + rd[dmx.second] + rd[dmi.second]) {
+                mx = dmx;
+                mi = dmi;
+                for (int k = 1; k <= N; k++)
+                    dp[k] = ddp[k];
+            }
+            else
+                swap(c[i], c[j]);
+        }
+    }
+
+    for (int i = 1; i <= N; i++)
+        cout << dp[i] << '\n';
+}
+
+int main(void) {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
+    //fstream inf("prob.txt");
+    //inf >> T;
+    cin >> T;
+
+    cout << fixed << setprecision(12);
+    for (int i = 1; i <= T; i++) {
+        //inf >> N;
+        cin >> N;
+
+        p.clear();
+        for (int j = 0; j <= N; j++)
+            dp[j] = 0;
+        ll r;
+        for (int j = 1; j <= N; j++) {
+            //inf >> r;
+            cin >> r;
+
+            rd[j] = r;
+            p.push_back({ r, j });
+        }
+        cout << "Case #" << i << '\n';
+        solve();
+    }
+
+    return 0;
+}
