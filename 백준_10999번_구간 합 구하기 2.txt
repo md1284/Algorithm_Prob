@@ -1,89 +1,97 @@
 #include <iostream>
-#include <cmath>
 #include <fstream>
 
 using namespace std;
 
-typedef long long LL;
+typedef long long ll;
 
 const int S = 1e6;
 int N, M, K;
-LL Tree[4*S+5], A[S+5], lazy[4*S+5];
+ll a[S + 5], Tree[4 * S + 5], lazy[4 * S + 5];
 
-LL init(int bucket, int start, int end) {
-	if(start == end)	return Tree[bucket] = A[start];
-	
-	return Tree[bucket] = init(bucket*2, start, (start+end)/2) 
-						+ init(bucket*2+1, (start+end)/2+1, end);
+void lazyp(int b, int s, int e, int l, int r) {
+    if (lazy[b] != 0) {
+        Tree[b] += ((ll)e - s + 1) * lazy[b];
+        if (s != e) {
+            lazy[b * 2] += lazy[b];
+            lazy[b * 2 + 1] += lazy[b];
+        }
+        lazy[b] = 0;
+    }
 }
 
-void rupdate(int bucket, int start, int end, int left, int right, LL x) {
-	if(lazy[bucket] != 0) {
-		Tree[bucket] += (end-start+1)*lazy[bucket];
-		if(start != end) {
-			lazy[bucket*2] += lazy[bucket];
-			lazy[bucket*2+1] += lazy[bucket];
-		}
-		lazy[bucket] = 0;
-	}
-	
-	if(right < start || end < left)	return;
-	
-	if(left <= start && end <= right) {
-		Tree[bucket] += (end-start+1)*x;
-		if(start != end) {
-			lazy[bucket*2] += x;
-			lazy[bucket*2+1] += x;
-		}
-		return;
-	}
-	rupdate(bucket*2, start, (start+end)/2, left, right, x);
-	rupdate(bucket*2+1, (start+end)/2+1, end, left, right, x);
-	
-	Tree[bucket] = Tree[bucket*2] + Tree[bucket*2+1];
+void init(int b, int s, int e) {
+    if (s == e) {
+        Tree[b] = a[s];
+        return;
+    }
+
+    int mid = (s + e) / 2;
+    init(b * 2, s, mid);
+    init(b * 2 + 1, mid + 1, e);
+    Tree[b] = Tree[b * 2] + Tree[b * 2 + 1];
 }
 
-LL get(int bucket, int start, int end, int left, int right) {
-	if(lazy[bucket] != 0) {
-		Tree[bucket] += (end-start+1)*lazy[bucket];
-		if(start != end) {
-			lazy[bucket*2] += lazy[bucket];
-			lazy[bucket*2+1] += lazy[bucket];
-		}
-		lazy[bucket] = 0;
-	}
+void update(int b, int s, int e, int l, int r, ll x) {
+    lazyp(b, s, e, l, r);
 
-	if(right < start || end < left)	return 0;
-	if(left <= start && end <= right)	return Tree[bucket];
-	
-	return get(bucket*2, start, (start+end)/2, left, right) 
-		+ get(bucket*2+1, (start+end)/2+1, end, left, right);
+    if (r < s || e < l)
+        return;
+    if (l <= s && e <= r) {
+        Tree[b] += ((ll)e - s + 1) * x;
+        if (s != e) {
+            lazy[b * 2] += x;
+            lazy[b * 2 + 1] += x;
+        }
+        return;
+    }
+
+    int mid = (s + e) / 2;
+    update(b * 2, s, mid, l, r, x);
+    update(b * 2 + 1, mid + 1, e, l, r, x);
+    Tree[b] = Tree[b * 2] + Tree[b * 2 + 1];
 }
 
-int main() {
-	//fstream inf("prob.txt");
-	//inf >> N >> M >> K;
-	scanf("%d %d %d", &N, &M, &K);
-	
-	for(int i = 1; i<=N; i++) {
-		//inf >> A[i];
-		scanf("%d", &A[i]);
-	}
-	init(1, 1, N);
-	for(int i = 1; i<=M+K; i++) {
-		int a, b, c;
-		LL x;
-		//inf >> a >> b >> c;
-		scanf("%d %d %d", &a, &b, &c);
-		
-		if(a == 1) {
-			//inf >> x;
-			scanf("%lld", &x);
-			rupdate(1, 1, N, b, c, x);
-		}
-		else
-			printf("%lld\n", get(1, 1, N, b, c));
-	}
+ll get(int b, int s, int e, int l, int r) {
+    lazyp(b, s, e, l, r);
 
-	return 0;
+    if (r < s || e < l)
+        return 0;
+    if (l <= s && e <= r)
+        return Tree[b];
+
+    int mid = (s + e) / 2;
+    return get(b * 2, s, mid, l, r) + get(b * 2 + 1, mid + 1, e, l, r);
+}
+
+
+int main(void) {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
+    fstream inf("prob.txt");
+    //inf >> N >> M >> K;
+    cin >> N >> M >> K;
+
+    for (int i = 1; i <= N; i++) {
+        //inf >> a[i];
+        cin >> a[i];
+    }
+    init(1, 1, N);
+
+    ll d;
+    for (int a,b,c,i = 0; i < M + K; i++) {
+        //inf >> a >> b >> c;
+        cin >> a >> b >> c;
+
+        if (a == 1) {
+            //inf >> d;
+            cin >> d;
+
+            update(1, 1, N, b, c, d);
+        }
+        else
+            printf("%lld\n", get(1, 1, N, b, c));
+    }
+
+    return 0;
 }

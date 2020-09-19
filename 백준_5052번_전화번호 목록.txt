@@ -7,42 +7,34 @@ using namespace std;
 
 int T, N;
 
-int toNumber(const char ch) {
-    return ch - '0';
-}
-
-struct TrieNode {
-    TrieNode* children[26];
+struct Trie {
+    Trie* children[10];
     bool terminal;
 
-    TrieNode() : terminal(false) {
+    Trie() {
         memset(children, 0, sizeof(children));
-    }
-    ~TrieNode() {
-        for (int i = 0; i < 26; i++) {
-            if (children[i])
-                delete children[i];
-        }
+        terminal = false;
     }
 
-    void insert(const char* key) {
-        if (*key == 0)
+    void insert(char* ch) {
+        if (*ch == NULL) {
             terminal = true;
-        else {
-            int next = toNumber(*key);
-            if (children[next] == NULL)
-                children[next] = new TrieNode();
-            children[next]->insert(key + 1);
+            return;
         }
+        int next = *ch - '0';
+        if (children[next] == NULL)
+            children[next] = new Trie();
+        children[next]->insert(ch + 1);
     }
 
-    TrieNode* find(const char* key) {
-        if (*key == 0)
+    Trie* find(char* ch) {
+        if (*ch == NULL)
             return this;
-        int next = toNumber(*key);
+
+        int next = *ch - '0';
         if (children[next] == NULL)
             return NULL;
-        return children[next]->find(key + 1);
+        return children[next]->find(ch + 1);
     }
 };
 
@@ -57,22 +49,22 @@ int main(void) {
         //inf >> N;
         cin >> N;
 
-        TrieNode* trie = new TrieNode();
         vector<string> str;
-        string s;
+        Trie* t = new Trie();
         for (int j = 0; j < N; j++) {
+            string s;
             //inf >> s;
             cin >> s;
 
             str.push_back(s);
-            trie->insert(&s[0]);
+            t->insert(&s[0]);
         }
 
         bool check = false;
         for (int j = 0; j < N; j++) {
-            TrieNode* p = trie->find(&str[j][0]);
+            Trie* p = t->find(&str[j][0]);
 
-            for (int k = 0; k < 26; k++) {
+            for (int k = 0; k < 10; k++) {
                 if (p->children[k] != NULL) {
                     check = true;
                     break;
@@ -86,6 +78,6 @@ int main(void) {
         else
             printf("YES\n");
     }
-    
+
     return 0;
 }
