@@ -1,0 +1,55 @@
+#include <iostream>
+#include <algorithm>
+#include <fstream>
+
+using namespace std;
+
+typedef long long ll;
+
+const int S = 1e5;
+int N, D;
+ll T[S + 5], V[S + 5];
+ll ret;
+
+ll calc(int i, int j) {
+    return ((ll)j - i) * T[j] + V[i];
+}
+
+void solve(int s, int e, int l, int r) {
+    if (s > e)
+        return;
+    int m = (s + e) / 2;
+    int k = min(r, m);
+
+    for (int i = min(r, m); i >= l; i--) {
+        if (m - i > D)
+            break;
+        if (calc(k, m) < calc(i, m))
+            k = i;
+    }
+    ret = max(ret, calc(k, m));
+    
+    solve(s, m - 1, l, k);
+    solve(m + 1, e, k, r);
+}
+
+int main(void) {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
+    //fstream inf("prob.txt");
+    //inf >> N >> D;
+    cin >> N >> D;
+
+    for (int i = 1; i <= N; i++) {
+        //inf >> T[i];
+        cin >> T[i];
+    }
+    for (int i = 1; i <= N; i++) {
+        //inf >> V[i];
+        cin >> V[i];
+    }
+    solve(1, N, 1, N);
+    printf("%lld", ret);
+
+    return 0;
+}

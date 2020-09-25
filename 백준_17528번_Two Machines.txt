@@ -1,0 +1,58 @@
+#include <iostream>
+#include <algorithm>
+#include <fstream>
+
+using namespace std;
+
+typedef pair<int, int> pii;
+
+const int S = 250, MX = 62500, INF = 1e9;
+int N;
+int a[S + 5], b[S + 5], dp[S + 5][MX + 5][2];
+
+int solve(int index, int t, int ab) {
+    if (index == N + 1)
+        return t;
+
+    int& ret = dp[index][t][ab];
+    if (ret != -1)
+        return ret;
+
+    if (ab == 0) {
+        ret = solve(index + 1, t + a[index], ab);
+        if (t >= b[index])
+            ret = min(ret, solve(index + 1, t - b[index], 0) + b[index]);
+        else
+            ret = min(ret, solve(index + 1, b[index] - t, 1) + t);
+    }
+    else {
+        ret = solve(index + 1, t + b[index], ab);
+        if (t >= a[index])
+            ret = min(ret, solve(index + 1, t - a[index], 1) + a[index]);
+        else
+            ret = min(ret, solve(index + 1, a[index] - t, 0) + t);
+    }
+    return ret;
+}
+
+int main(void) {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
+    //fstream inf("prob.txt");
+    //inf >> N;
+    cin >> N;
+
+    for (int i = 1; i <= N; i++) {
+        //inf >> a[i] >> b[i];
+        cin >> a[i] >> b[i];
+    }
+
+    for (int i = 0; i <= N; i++) {
+        for (int j = 0; j <= MX; j++) {
+            dp[i][j][0] = dp[i][j][1] = -1;
+        }
+    }
+    printf("%d", min(solve(1, 0, 0), solve(1, 0, 1)));
+
+    return 0;
+}

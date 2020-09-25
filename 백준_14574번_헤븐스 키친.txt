@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <cmath>
 #include <fstream>
 
 using namespace std;
@@ -9,11 +10,13 @@ typedef long long ll;
 typedef pair<int, int> pii;
 typedef pair<int, pair<int, int>> pdi;
 
-const int S = 1e5, mod = 1e9;
-int N, M;
+const int S = 1000;
+int N;
 int pt[S + 5], d[S + 5];
-ll psum[S + 5];
+pii nd[S + 5];
 vector<pdi> edge;
+vector<int> adj[S + 5];
+bool visited[S + 5];
 
 bool cmp(const pdi& a, const pdi& b) {
     return a.first > b.first;
@@ -32,24 +35,42 @@ void join(int a, int b) {
     if (a == b)
         return;
 
-    if (d[a] < d[b]) {
+    if (d[a] < d[b])
         pt[a] = b;
-        d[b] += d[a];
-    }
+    else if (d[a] > d[b])
+        pt[b] = a;
     else {
         pt[b] = a;
-        d[a] += d[b];
+        d[a]++;
     }
 }
 
+int rt(const pii& a, const pii& b) {
+    return (a.first + b.first) / abs(a.second - b.second);
+}
 
-ll solve() {
+void dfs(int here) {
+    visited[here] = true;
+
+    for (int i = 0; i < adj[here].size(); i++) {
+        int there = adj[here][i];
+
+        if (visited[there] == true)
+            continue;
+
+        dfs(there);
+        printf("%d %d\n", here, there);
+    }
+}
+
+void solve() {
+    for (int i = 1; i <= N; i++) {
+        for (int j = i + 1; j <= N; j++)
+            edge.push_back({ rt(nd[i], nd[j]), {i, j} });
+    }
+
     sort(edge.begin(), edge.end(), cmp);
 
-    psum[0] = edge[M - 1].first;
-    for (int i = 1; i < edge.size(); i++)
-        psum[i] = (psum[i - 1] + edge[M - i - 1].first) % mod;
-    
     ll ret = 0;
     for (int a,b,c,i = 0; i < edge.size(); i++) {
         c = edge[i].first;
@@ -57,33 +78,33 @@ ll solve() {
         b = edge[i].second.second;
 
         if (find(a) != find(b)) {
-            ret += ((ll)d[find(a)] * d[find(b)] % mod) * psum[M - i - 1] % mod;
-            ret %= mod;
+            ret += c;
             join(a, b);
+
+            adj[a].push_back(b);
+            adj[b].push_back(a);
         }
     }
-    return ret;
+
+    printf("%lld\n", ret);
+    dfs(1);
 }
 
 int main(void) {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL); cout.tie(NULL);
     //fstream inf("prob.txt");
-    //inf >> N >> M;
-    cin >> N >> M;
+    //inf >> N;
+    cin >> N;
 
-    for (int i = 1; i <= N; i++) {
+    for (int p,c,i = 1; i <= N; i++) {
+        //inf >> p >> c;
+        cin >> p >> c;
+
+        nd[i] = { c, p };
         pt[i] = i;
-        d[i] = 1;
     }
-    
-    for (int x,y,w,i = 0; i < M; i++) {
-        //inf >> x >> y >> w;
-        cin >> x >> y >> w;
-
-        edge.push_back({ w, {x, y} });
-    }
-    printf("%lld", solve());
+    solve();
 
     return 0;
 }
