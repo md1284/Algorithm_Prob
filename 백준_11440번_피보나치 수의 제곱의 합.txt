@@ -5,7 +5,7 @@ using namespace std;
 
 typedef long long ll;
 
-const ll mod = 1e6;
+const ll mod = 1e9 + 7;
 ll N;
 ll dp[2][2][65], b[2], ret[2];
 
@@ -16,10 +16,10 @@ ll solve() {
     dp[1][1][0] = 1;
 
     for (int i = 0; i < 63; i++) {
-        dp[0][0][i + 1] = (dp[0][0][i] * dp[0][0][i]) % mod + (dp[0][1][i] * dp[1][0][i]) % mod;
-        dp[0][1][i + 1] = (dp[0][0][i] * dp[0][1][i]) % mod + (dp[0][1][i] * dp[1][1][i]) % mod;
-        dp[1][0][i + 1] = (dp[1][0][i] * dp[0][0][i]) % mod + (dp[1][1][i] * dp[1][0][i]) % mod;
-        dp[1][1][i + 1] = (dp[1][0][i] * dp[0][1][i]) % mod + (dp[1][1][i] * dp[1][1][i]) % mod;
+        dp[0][0][i + 1] = dp[0][0][i] * dp[0][0][i] % mod + dp[0][1][i] * dp[1][0][i] % mod;
+        dp[0][1][i + 1] = dp[0][0][i] * dp[0][1][i] % mod + dp[0][1][i] * dp[1][1][i] % mod;
+        dp[1][0][i + 1] = dp[1][0][i] * dp[0][0][i] % mod + dp[1][1][i] * dp[1][0][i] % mod;
+        dp[1][1][i + 1] = dp[1][0][i] * dp[0][1][i] % mod + dp[1][1][i] * dp[1][1][i] % mod;
 
         dp[0][0][i + 1] %= mod;
         dp[0][1][i + 1] %= mod;
@@ -36,8 +36,8 @@ ll solve() {
 
         N -= ((ll)1 << i);
 
-        ret[0] = (dp[0][0][i] * b[0]) % mod + (dp[0][1][i] * b[1]) % mod;
-        ret[1] = (dp[1][0][i] * b[0]) % mod + (dp[1][1][i] * b[1]) % mod;
+        ret[0] = dp[0][0][i] * b[0] % mod + dp[0][1][i] * b[1] % mod;
+        ret[1] = dp[1][0][i] * b[0] % mod + dp[1][1][i] * b[1] % mod;
 
         ret[0] %= mod;
         ret[1] %= mod;
@@ -45,8 +45,7 @@ ll solve() {
         b[0] = ret[0];
         b[1] = ret[1];
     }
-
-    return ret[0];
+    return ret[0] * ret[1] % mod;
 }
 
 int main(void) {

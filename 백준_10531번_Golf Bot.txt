@@ -1,0 +1,95 @@
+#define _USE_MATH_DEFINES
+
+#include <iostream>
+#include <vector>
+#include <complex>
+#include <cmath>
+#include <algorithm>
+#include <fstream>
+
+using namespace std;
+
+typedef complex<double> base;
+
+void fft(vector<base>& a, bool inv) {
+	int n = (int)a.size();
+	for (int i = 1, j = 0; i < n; i++) {
+		int bit = n >> 1;
+		while (!((j ^= bit) & bit)) bit >>= 1;
+		if (i < j) swap(a[i], a[j]);
+	}
+	for (int i = 1; i < n; i <<= 1) {
+		double x = inv ? M_PI / i : -M_PI / i;
+		base w = { cos(x), sin(x) };
+		for (int j = 0; j < n; j += i << 1) {
+			base th = { 1, 0 };
+			for (int k = 0; k < i; k++) {
+				base tmp = a[i + j + k] * th;
+				a[i + j + k] = a[j + k] - tmp;
+				a[j + k] += tmp;
+				th *= w;
+			}
+		}
+	}
+	if (inv) {
+		for (int i = 0; i < n; i++) {
+			a[i] /= n;
+		}
+	}
+}
+
+vector<base> multiply(vector<base> a, vector<base> b) {
+	int n = (int)max(a.size(), b.size());
+	int i = 0;
+
+	while ((1 << i) < (n << 1)) i++;
+	n = 1 << i;
+	a.resize(n);
+	b.resize(n);
+
+	vector<base> ans(n);
+
+	fft(a, false);
+	fft(b, false);
+
+	for (int i = 0; i < n; i++)
+		ans[i] = a[i] * b[i];
+	fft(ans, true);
+
+	return ans;
+}
+
+const int S = 2e5;
+int N, M;
+vector<base> a(S + 1);
+
+int main(void) {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
+    //fstream inf("prob.txt");
+	//inf >> N;
+	cin >> N;
+
+	a[0] = 1;
+	for (int k, i = 0; i < N; i++) {
+		//inf >> k;
+		cin >> k;
+
+		a[k] = 1;
+	}
+	//inf >> M;
+	cin >> M;
+
+	vector<base> ans = multiply(a, a);
+	int ret = 0;
+	for (int d, i = 0; i < M; i++) {
+		//inf >> d;
+		cin >> d;
+
+		if (ans[d].real() > 0.5)
+			ret++;
+	}
+	printf("%d", ret);
+
+    return 0;
+}
