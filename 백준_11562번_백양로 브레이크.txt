@@ -1,64 +1,54 @@
 #include <iostream>
-#include <algorithm>
-#include <fstream>
 
 using namespace std;
 
-const int INF = 987654321;
-int N, M, k;
-int adj[251][251];
+const int INF = 1e9;
+int N, M, K;
+int adj[255][255];
 
-void Floyd() {
-    for (int k = 1; k <= N; k++) {
-        for (int i = 1; i <= N; i++) {
-            for (int j = 1; j <= N; j++) {
+void solve() {
+    for(int k = 1; k<=N; k++) {
+        for(int i = 1; i<=N; i++) {
+            for(int j = 1; j<=N; j++)
                 adj[i][j] = min(adj[i][j], adj[i][k] + adj[k][j]);
-            }
         }
     }
 }
 
-int main(void) {
+int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL); cout.tie(NULL);
-    //fstream inf("prob.txt");
-    //inf >> N >> M;
     cin >> N >> M;
 
-    for (int i = 1; i <= N; i++) {
-        for (int j = 1; j <= N; j++) {
-            if (i == j)
-                adj[i][j] = 0;
-            else
-                adj[i][j] = INF;
+    for(int i = 1; i<=N; i++) {
+        for(int j = 1; j<=N; j++) {
+            if(i == j)
+                continue;
+            adj[i][j] = INF;
         }
     }
-
-    for (int u,v,b,i = 0; i < M; i++) {
-        //inf >> u >> v >> b;
+    for(int i = 0; i<M; i++) {
+        int u, v, b;
         cin >> u >> v >> b;
 
-        if (b == 1) {
+        if(b == 0) {
+            adj[v][u] = 1;
             adj[u][v] = 0;
-            adj[v][u] = 0;
         }
         else {
             adj[u][v] = 0;
-            adj[v][u] = 1;
+            adj[v][u] = 0;
         }
     }
-    Floyd();
+    solve();
+    cin >> K;
 
-    //inf >> k;
-    cin >> k;
-
-    for (int s,e,i = 0; i < k; i++) {
-        //inf >> s >> e;
+    for(int i = 0; i<K; i++) {
+        int s, e;
         cin >> s >> e;
 
-        printf("%d\n", adj[s][e]);
+        cout << adj[s][e] << '\n';
     }
-
 
     return 0;
 }
