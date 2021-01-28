@@ -1,0 +1,79 @@
+#include <iostream>
+#include <set>
+#include <algorithm>
+ 
+using namespace std;
+ 
+const int S = 2000;
+int T, N;
+int a[S+5];
+multiset<int> st;
+ 
+bool check(int x, bool t) {
+    int a1 = a[2*N], a2 = x - a[2*N];
+ 
+    while(!st.empty()) {
+        if(st.find(a1) == st.end() || st.find(a2) == st.end())
+            return false;
+        if(a1 == a2 && st.count(a1) == 1)
+            return false;
+ 
+        x = max(a1, a2);
+        multiset<int>::iterator it = st.find(a1);
+        st.erase(it);
+        it = st.find(a2);
+        st.erase(it);
+ 
+        if(t == true)
+            cout << a1 << " " << a2 << '\n';
+ 
+        if(st.empty())
+            break;
+ 
+        a1 = *st.rbegin();
+        a2 = x - a1;
+    }
+    return true;
+}
+ 
+int solve() {
+    sort(a+1, a+2*N+1);
+ 
+    for(int i = 1; i<=2*N-1; i++) {
+        st.clear();
+        for(int j = 1; j<=2*N; j++)
+            st.insert(a[j]);
+ 
+        int x = a[i] + a[2*N];
+        if(check(x, false) == true)
+            return x;
+    }
+    return -1;
+}
+ 
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
+    cin >> T;
+ 
+    for(int i = 0; i<T; i++) {
+        cin >> N;
+ 
+        for(int j = 1; j<=2*N; j++)
+            cin >> a[j];
+        
+        int x = solve();
+        if(x == -1)
+            cout << "NO" << '\n';
+        else {
+            cout << "YES" << '\n';
+            cout << x << '\n';
+            st.clear();
+            for(int j = 1; j<=2*N; j++)
+                st.insert(a[j]);
+            check(x, true);
+        }
+    }
+ 
+    return 0;
+}

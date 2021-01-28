@@ -1,0 +1,60 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+ 
+using namespace std;
+ 
+typedef long long ll;
+typedef pair<int,int> pii;
+ 
+const int S = 2e5;
+int T, A, B, K;
+int ca[S+5], cb[S+5], boy[S+5], girl[S+5];
+vector<pii> pr;
+ 
+ll solve() {
+    ll ret = 0;
+ 
+    for(int i = 0; i<K; i++) {
+        ll t = K;
+        int a = pr[i].first, b = pr[i].second;
+        t -= boy[a];
+        t -= girl[b];
+        t += upper_bound(pr.begin(), pr.end(), make_pair(a,b)) - lower_bound(pr.begin(), pr.end(), make_pair(a,b));
+ 
+        ret += t;
+    }
+    return ret/2;
+}
+ 
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
+    cin >> T;
+ 
+    for(int i = 0 ; i<T; i++) {
+        cin >> A >> B >> K;
+ 
+        for(int j = 1; j<=K; j++)
+            cin >> ca[j];
+        for(int j = 1; j<=K; j++)
+            cin >> cb[j];
+        for(int j = 1; j<=K; j++) {
+            int a = ca[j], b = cb[j];
+            boy[a]++;
+            girl[b]++;
+            pr.push_back({a,b});
+        }
+        sort(pr.begin(), pr.end());
+ 
+        cout << solve() << '\n';
+ 
+        pr.clear();
+        for(int j = 1; j<=A; j++)
+            boy[j] = 0;
+        for(int j = 1; j<=B; j++)
+            girl[j] = 0;
+    }
+ 
+    return 0;
+}

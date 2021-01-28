@@ -1,0 +1,85 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+ 
+using namespace std;
+ 
+typedef long long ll;
+ 
+const int S = 2e5, INF = 2e9;
+int T, N, M;
+int a[S+5], b[S+5];
+vector<int> v1, v2;
+ 
+bool cmp(const int &a, const int &b) {
+    return a > b;
+}
+ 
+int solve() {
+    sort(v1.begin(), v1.end(), cmp);
+    sort(v2.begin(), v2.end(), cmp);
+    
+    int ret = INF, cost = 0;
+    ll sum = 0;
+    for(int i = 0; i<v2.size(); i++) {
+        sum += v2[i];
+        cost += 2;
+    }
+    
+    if(sum >= M)
+        ret = min(ret, cost);
+ 
+    for(int i = 0, j = v2.size()-1; i<=v1.size(); i++) {
+        while(sum >= M && j >= 0) {
+            ret = min(ret, cost);
+            
+            sum -= v2[j];
+            j--;
+            cost -= 2;
+        }
+        if(sum >= M)
+            ret = min(ret, cost);
+        if(i < v1.size()) {
+            sum += v1[i];
+            cost++;
+        }
+        if(sum >= M)
+            ret = min(ret, cost);
+    }
+ 
+    if(ret == INF)
+        return -1;
+    return ret;
+}
+ 
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
+    cin >> T;
+ 
+    for(int i = 0; i<T; i++) {
+        cin >> N >> M;
+ 
+        for(int j = 1; j<=N; j++)
+            cin >> a[j];
+        for(int j = 1; j<=N; j++)
+            cin >> b[j];
+        
+        for(int j = 1; j<=N; j++) {
+            if(b[j] == 1)
+                v1.push_back(a[j]);
+            else
+                v2.push_back(a[j]);
+        }
+        cout << solve() << '\n';
+ 
+        for(int j = 1; j<=N; j++) {
+            a[j] = 0;
+            b[j] = 0;
+        }
+        v1.clear();
+        v2.clear();
+    }
+ 
+    return 0;
+}

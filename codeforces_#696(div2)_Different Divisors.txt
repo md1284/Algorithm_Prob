@@ -1,0 +1,56 @@
+#include <iostream>
+#include <vector>
+ 
+using namespace std;
+ 
+const int S = 1e5;
+int T, D;
+bool era[S+5];  // era[prime]: false
+ 
+void init() {
+    for(int i = 2; i<=S; i++) {
+        if(era[i] == true)
+            continue;
+        for(int j = i+i; j<=S; j+=i) {
+            era[j] = true;
+        }
+    }
+}
+ 
+int solve() {
+    int c = 1, st = 1;
+    vector<int> ret;
+    ret.push_back(1);
+ 
+    while(c < 3) {
+        for(int i = st+D; i<=S; i++) {
+            if(era[i] == false) {
+                c++;
+                st = i;
+                ret.push_back(st);
+                break;
+            }
+        }
+    }
+    
+    int sol = 1;
+    for(int i = 0; i<ret.size(); i++)
+        sol *= ret[i];
+ 
+    return sol;
+}
+ 
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
+    cin >> T;
+ 
+    init();
+    for(int i = 0; i<T; i++) {
+        cin >> D;
+ 
+        cout << solve() << '\n';
+    }
+ 
+    return 0;
+}
