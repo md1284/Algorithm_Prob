@@ -1,0 +1,51 @@
+#include <iostream>
+ 
+using namespace std;
+ 
+int T;
+string s, t;
+ 
+int gcd(int p, int q) {
+    if(p > q)
+        swap(p, q);
+    if(p == 0)
+        return q;
+    return gcd(q % p, p);
+}
+ 
+void solve() {
+    int N = s.size(), M = t.size();
+    int lc = gcd(N, M);
+ 
+    string a = s, b = t;
+    for(int i = 0; i< M/lc-1; i++)
+        a += s;
+    for(int i = 0; i< N/lc-1; i++)
+        b += t;
+    
+    bool check = true;
+    for(int i = 0; i<a.size(); i++) {
+        if(a[i] != b[i]) {
+            check = false;
+            break;
+        }
+    }
+    if(check == false)
+        cout << -1 << '\n';
+    else
+        cout << a << '\n';
+}
+ 
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
+    cin >> T;
+ 
+    for(int i = 0; i<T; i++) {
+        cin >> s >> t;
+ 
+        solve();
+    }
+ 
+    return 0;
+}

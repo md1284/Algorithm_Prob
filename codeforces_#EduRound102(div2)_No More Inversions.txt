@@ -1,0 +1,34 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+ 
+using namespace std;
+ 
+const int S = 2e5;
+int T, N, K;
+int a[S+5];
+ 
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
+    cin >> T;
+ 
+    for(int i = 0; i<T; i++) {
+        cin >> N >> K;
+ 
+        if(N == K) {
+            for(int j = 1; j<=K; j++)
+                cout << j << " ";
+            cout << '\n';
+            continue;
+        }
+ 
+        for(int j = 1; j<2*K-N; j++)
+            cout << j << " ";
+        for(int j = K; j>=2*K-N; j--)
+            cout << j << " ";
+        cout << '\n';
+    }
+ 
+    return 0;
+}

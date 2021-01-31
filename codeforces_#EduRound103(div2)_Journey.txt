@@ -1,0 +1,82 @@
+#include <iostream>
+#include <set>
+#include <cstring>
+ 
+using namespace std;
+ 
+typedef pair<int,int> pii;
+ 
+const int S = 3e5;
+int T, N;
+int dp[S+5];
+string s;
+set<pii> p;
+bool visited[S+5][2];
+ 
+void dfs(int here, int t) {
+    visited[here][t] = true;
+    p.insert({here, t});
+ 
+    if(t == true) {
+        if(s[here] == 'L' && visited[here-1][!t] != true)
+            dfs(here-1, !t);
+        if(here != N && s[here+1] == 'R' && visited[here+1][!t] != true)
+            dfs(here+1, !t);
+        
+        if(s[here] == '0' && s[here+1] == 'R' && visited[here+1][!t] != true)
+            dfs(here+1, !t);
+    }
+    else {
+        if(s[here] == 'R' && visited[here-1][!t] != true)
+            dfs(here-1, !t);
+        if(here != N && s[here+1] == 'L' && visited[here+1][!t] != true)
+            dfs(here+1, !t);
+        
+        if(s[here] == '0' && s[here+1] == 'L' && visited[here+1][!t] != true)
+            dfs(here+1, !t);
+    }
+}
+ 
+void solve() {
+    memset(dp, 0, sizeof(dp));
+    memset(visited, 0, sizeof(visited));
+ 
+    for(int i = 0; i<=N; i++) {
+        if(visited[i][true] == true)
+            continue;
+ 
+        p.clear();
+        dfs(i, true);
+ 
+        for(set<pii>::iterator it = p.begin(); it!=p.end(); it++) {
+            int here  = (*it).first;
+            int t = (*it).second;
+            if(t == false)
+                continue;
+ 
+            dp[here] = p.size();
+        }
+    }
+    for(int i = 0; i<=N; i++)
+        cout << dp[i] << " ";
+    cout << '\n';
+}
+ 
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
+    cin >> T;
+ 
+    for(int i = 0; i<T; i++) {
+        cin >> N;
+ 
+        s = "0";
+        string str;
+        cin >> str;
+        s += str;
+ 
+        solve();
+    }
+ 
+    return 0;
+}

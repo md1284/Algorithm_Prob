@@ -1,0 +1,73 @@
+#include <iostream>
+ 
+using namespace std;
+ 
+const int S = 3e5;
+int T, N;
+int a[S+5];
+bool v[S+5];
+ 
+int solve() {
+    for(int i = 1; i<=N; i++)
+        v[i] = false;
+ 
+    for(int i = 2; i<=N-1; i++) {
+        if(a[i] > a[i-1] && a[i] > a[i+1])
+            v[i] = true;
+        
+        if(a[i] < a[i-1] && a[i] < a[i+1])
+            v[i] = true;
+    }
+ 
+    bool t1 = false, t2 = false, t3 = false;
+    for(int i = 2; i<=N-2; i++) {
+        if(v[i] && v[i+1] && v[i+2])
+            t3 = true;
+    }
+    for(int i = 2; i<=N-2; i++) {
+        if(v[i] && v[i+1]) {
+            int h = max(a[i], a[i+1]);
+            int l = min(a[i], a[i+1]);
+ 
+            if(i == 2 || i == N-2)
+                t2 = true;
+            else if(a[i-2] == a[i-1] || a[i+2] == a[i+3])
+                t2 = true;
+            else if(!v[i-1] && !v[i+2] && l < a[i-1] && a[i-1] < h && l < a[i+2] && a[i+2] < h)
+                t1 = true;
+            else
+                t2 = true;
+        }
+    }
+ 
+    int ret = 0;
+    for(int i = 1; i<=N; i++) {
+        if(v[i] == true)
+            ret++;
+    }
+    if(t3 == true)
+        return ret-3;
+    if(t2 == true)
+        return ret-2;
+    if(t1 == true)
+        return ret-1;
+ 
+    return max(0, ret-1);
+}
+ 
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
+    cin >> T;
+ 
+    for(int i = 0; i<T; i++) {
+        cin >> N;
+ 
+        for(int j = 1; j<=N; j++)
+            cin >> a[j];
+        
+        cout << solve() << '\n';
+    }
+ 
+    return 0;
+}

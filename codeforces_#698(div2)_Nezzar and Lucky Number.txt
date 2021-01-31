@@ -1,0 +1,55 @@
+#include <iostream>
+#include <vector>
+ 
+using namespace std;
+ 
+const int S = 1e4;
+int T, Q, D;
+vector<int> c;
+ 
+bool solve(int a) {
+    if(a >= 100)
+        return true;
+ 
+    int n = 10 + (a % 10) - D;
+    n += 10 * D;
+    if(a >= n)
+        return true;
+    
+    for(int i = 0; i<c.size(); i++) {
+        if(a == c[i])
+            return true;
+        if(a > c[i] && solve(a - c[i]) == true)
+            return true;
+    }
+ 
+    return false;
+}
+ 
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
+    cin >> T;
+ 
+    for(int i = 0; i<T; i++) {
+        cin >> Q >> D;
+ 
+        c.clear();
+        c.push_back(D);
+        for(int j = 1; j<=9; j++) {
+            c.push_back(10 * D + j);
+            c.push_back(10 * j + D);
+        }
+        for(int j = 1; j<=Q; j++) {
+            int a;
+            cin >> a;
+            
+            if(solve(a) == true)
+                cout << "YES" << '\n';
+            else
+                cout << "NO" << '\n';
+        }
+    }
+ 
+    return 0;
+}

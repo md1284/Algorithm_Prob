@@ -1,0 +1,100 @@
+#include <iostream>
+#include <cstring>
+ 
+using namespace std;
+ 
+typedef pair<int,int> pii;
+ 
+const int S = 2e5, INF = 1e9;
+int T, N, M;
+int psum[S+5];
+pii Tree[4*S+5];
+ 
+void init(int b, int s, int e) {
+    if(s == e) {
+        Tree[b] = {psum[s], psum[s]};
+        return;
+    }
+ 
+    int mid = (s+e)/2;
+    init(b*2, s, mid);
+    init(b*2+1, mid+1, e);
+    Tree[b].first = min(Tree[b*2].first, Tree[b*2+1].first);
+    Tree[b].second = max(Tree[b*2].second, Tree[b*2+1].second);
+}
+ 
+pii get(int b, int s, int e, int l, int r) {
+    if(r < s || e < l)
+        return {INF, -INF};
+    
+    if(l <= s && e <= r)
+        return Tree[b];
+    
+    int mid = (s+e)/2;
+    pii lt = get(b*2, s, mid, l, r);
+    pii rt = get(b*2+1, mid+1, e, l, r);
+    return {min(lt.first, rt.first), max(lt.second, rt.second)};
+}
+ 
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
+    cin >> T;
+ 
+    for(int i = 0; i<T; i++) {
+        cin >> N >> M;
+ 
+        string s;
+        cin >> s;
+ 
+        for(int j = 1; j<=N; j++)
+            psum[j] = psum[j-1] + (s[j-1] == '-' ? -1 : 1);
+ 
+        init(1, 1, N);
+        for(int j = 0; j<M; j++) {
+            int l, r;
+            cin >> l >> r;
+ 
+            pii lt = {INF, -INF}, rt = {INF, -INF};
+            bool c1 = false, c2 = false, c = false;
+            if(1 <= l-1) {
+                lt = get(1, 1, N, 1, l-1);
+                lt = {min(lt.first, 0), max(lt.second, 0)};
+                c1 = true;
+            }
+            if(N >= r+1) {
+                rt = get(1, 1, N, r+1, N);
+                if(c1 == false) {
+                    rt.first -= psum[r];
+                    rt.second -= psum[r];
+                    rt = {min(rt.first, 0), max(rt.second, 0)};
+                }
+                else {
+                    rt.first -= psum[r] - psum[l-1];
+                    rt.second -= psum[r] - psum[l-1];
+                }
+                c2 = true;
+            }
+            c = c1 && c2;
+ 
+            
+            pii ret = {min(lt.first, rt.first), max(lt.second, rt.second)};
+            //cout << "lt: " << lt.first << " " << lt.second << '\n';
+            //cout << "rt: " << rt.first << " " << rt.second << '\n';
+            //cout << "ret: " << ret.first << " " << ret.second << '\n';
+ 
+            if(ret.first == INF && ret.second == -INF)
+                cout << 1 << '\n';
+            else {
+                cout << ret.second - ret.first + 1 << '\n';
+            }
+        }
+ 
+        for(int j = 0; j<=N; j++)
+            psum[j] = 0;
+        for(int j = 0; j<4*N+5; j++)
+            Tree[j] = {0, 0};
+    }
+ 
+    return 0;
+}

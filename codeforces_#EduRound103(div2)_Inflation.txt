@@ -1,0 +1,51 @@
+#include <iostream>
+#include <cstring>
+ 
+using namespace std;
+ 
+typedef long long ll;
+ 
+const ll INF = 1e15;
+const int S = 100;
+int T, N, K;
+ll p[S+5], psum[S+5], dp[S+5];
+ 
+ll solve() {
+    memset(psum, 0, sizeof(psum));
+    memset(dp, 0, sizeof(dp));
+ 
+    for(int i = 1; i<=N; i++)
+        psum[i] = psum[i-1] + p[i];
+ 
+    for(int i = N; i>=2; i--) {
+        if((ll)100 * p[i] <= (ll)K * psum[i-1])
+            continue;
+        double d = 1.0 * (ll)100 * p[i] / K;
+        if((ll)d == d)
+            dp[i-1] = (ll)d;
+        else
+            dp[i-1] = (ll)d + 1;
+    }
+ 
+    ll ret = 0;
+    for(int i = 1; i<N; i++)
+        ret = max(ret, dp[i] - psum[i]);
+    return ret;
+}
+ 
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
+    cin >> T;
+ 
+    for(int i = 0; i<T; i++) {
+        cin >> N >> K;
+ 
+        for(int j = 1; j<=N; j++)
+            cin >> p[j];
+        
+        cout << solve() << '\n';
+    }
+ 
+    return 0;
+}
