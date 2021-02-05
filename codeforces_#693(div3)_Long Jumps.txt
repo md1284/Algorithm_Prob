@@ -1,0 +1,41 @@
+#include <iostream>
+ 
+using namespace std;
+ 
+typedef long long ll;
+ 
+const int S = 2e5;
+int T, N;
+ll a[S+5], dp[S+5];
+ 
+ll solve() {
+    for(int i = 1; i<=N; i++)
+        dp[i] = 0;
+ 
+    for(int i = 1; i<=N; i++) {
+        if(a[i]+i <= N)
+            dp[i+a[i]] = max(dp[i+a[i]], dp[i]+a[i]);
+    }
+    
+    ll ret = 0;
+    for(int i = 1; i<=N; i++)
+        ret = max(ret, dp[i]+a[i]);
+    return ret;
+}
+ 
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
+    cin >> T;
+ 
+    for(int i = 0; i<T; i++) {
+        cin >> N;
+ 
+        for(int j = 1; j<=N; j++)
+            cin >> a[j];
+        
+        cout << solve() << '\n';
+    }
+ 
+    return 0;
+}

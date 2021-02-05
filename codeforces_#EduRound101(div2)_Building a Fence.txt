@@ -1,0 +1,55 @@
+#include <iostream>
+
+using namespace std;
+
+const int S = 2e5;
+int T, N, K;
+int h[S+5];
+
+bool solve() {
+    int phi = h[1]+K, plo = h[1];
+
+    for(int i = 2; i<N; i++) {
+        int chi = min(h[i]+K-1+K, phi-1+K);
+        int clo = max(h[i], plo+1-K);
+
+        if(phi <= chi && phi > clo) {
+            phi = chi;
+            plo = clo;
+            continue;
+        }
+        if(phi >= chi && plo < chi) {
+            phi = chi;
+            plo = clo;
+            continue;
+        }
+        return false;
+    }
+
+    int chi = h[N]+K, clo = h[N];
+    if(phi <= chi && phi > clo)
+        return true;
+    if(phi >= chi && plo < chi)
+        return true;
+    return false;
+}
+
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
+    cin >> T;
+ 
+    for(int i = 0; i<T; i++) {
+        cin >> N >> K;
+
+        for(int j = 1; j<=N; j++)
+            cin >> h[j];
+        
+        if(solve() == true)
+            cout << "YES" << '\n';
+        else
+            cout << "NO" << '\n';
+    }
+ 
+    return 0;
+}

@@ -1,0 +1,96 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+ 
+using namespace std;
+ 
+typedef pair<int,int> pii;
+typedef pair<pii,int> pdi;
+ 
+const int S = 2e5, INF = 2e9;
+int T, N;
+int h[S+5], w[S+5], inv[S+5], ret[S+5];
+pii Tree[4*S+5];
+vector<pdi> p;
+ 
+void init(int b, int s, int e) {
+    if(s == e) {
+        Tree[b] = {w[inv[s]], inv[s]};
+        return;
+    }
+ 
+    int mid = (s+e)/2;
+    init(b*2, s, mid);
+    init(b*2+1, mid+1, e);
+    Tree[b] = min(Tree[b*2], Tree[b*2+1]);
+}
+ 
+pii get(int b, int s, int e, int l, int r) {
+    if(r < s || e < l)
+        return {INF, INF};
+    if(l <= s && e <= r)
+        return Tree[b];
+    
+    int mid = (s+e)/2;
+    return min(get(b*2, s, mid, l, r), get(b*2+1, mid+1, e, l, r));
+}
+ 
+void solve() {
+    for(int i = 1; i<=4*N+5; i++)
+        Tree[i] = {0,0};
+    for(int i = 1; i<=N; i++)
+        ret[i] = -1;
+ 
+    p.clear();
+    for(int i = 1; i<=N; i++)
+        p.push_back({{h[i], w[i]}, i});
+ 
+    sort(p.begin(), p.end());
+    for(int i = 0; i<p.size(); i++)
+        inv[i+1] = p[i].second;
+ 
+    init(1, 1, N);
+    
+    for(int i = 0; i<p.size(); i++) {
+        int idx = p[i].second;
+ 
+        vector<pdi>::iterator it = lower_bound(p.begin(), p.end(), make_pair(make_pair(h[idx], 0), 0));
+        int rg;
+        pii mw;
+        if(it != p.begin()) {
+            rg = it - p.begin();
+            mw = get(1, 1, N, 1, rg);
+            if(mw.first < w[idx])
+                ret[idx] = mw.second;
+        }
+        
+        it = lower_bound(p.begin(), p.end(), make_pair(make_pair(w[idx], 0), 0));
+        if(it != p.begin()) {
+            rg = it - p.begin();
+            mw = get(1, 1, N, 1, rg);
+            if(mw.first < h[idx])
+                ret[idx] = mw.second;
+        }
+    }
+ 
+    for(int i = 1; i<=N; i++)
+        cout << ret[i] << " ";
+    cout << '\n';
+}
+ 
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
+    cin >> T;
+ 
+    for(int i = 0; i<T; i++) {
+        cin >> N;
+ 
+        for(int j = 1; j<=N; j++)
+            cin >> h[j] >> w[j];
+        
+        solve();
+    }
+ 
+    return 0;
+}

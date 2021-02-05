@@ -1,0 +1,57 @@
+#include <iostream>
+#include <deque>
+ 
+using namespace std;
+ 
+typedef long long ll;
+typedef pair<ll,ll> pll;
+ 
+const int S = 1e5;
+int T, N, x;
+ll a[S+5];
+deque<pll> dq;
+ 
+ll solve() {
+    for(int i = 1; i<=N; i++)
+        dq.push_back({a[i], 1});
+ 
+    ll ret = 0;
+    while(!dq.empty()) {
+        ll n = dq.front().first;
+        ll cnt = dq.front().second;
+        dq.pop_front();
+ 
+        ret += n * cnt;
+        if(n % x != 0)
+            break;
+        dq.push_back({n/x, cnt * x});
+    }
+ 
+    while(!dq.empty()) {
+        ll n = dq.front().first;
+        ll cnt = dq.front().second;
+        dq.pop_front();
+ 
+        ret += n * cnt;
+    }
+ 
+    return ret;
+}
+ 
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
+    cin >> T;
+ 
+    for(int i = 0; i<T; i++) {
+        cin >> N >> x;
+ 
+        dq.clear();
+        for(int j = 1; j<=N; j++)
+            cin >> a[j];
+        
+        cout << solve() << '\n';
+    }
+ 
+    return 0;
+}

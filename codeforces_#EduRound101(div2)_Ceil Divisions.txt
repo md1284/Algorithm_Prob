@@ -1,0 +1,59 @@
+#include <iostream>
+#include <vector>
+#include <cmath>
+
+using namespace std;
+
+typedef pair<int,int> pii;
+
+const int S = 2e5;
+int T, N;
+vector<pii> v;
+bool visited[S+5];
+
+void solve() {
+    v.clear();
+    int p = N, cnt = 0;
+    
+    while(p > 2) {
+        int r = sqrt(p);
+        if(r*r < p)
+            r++;
+        
+        v.push_back({p, r});
+        visited[r] = true;
+        visited[p] = true;
+
+        p = r;
+        cnt++;
+    }
+
+    int m = N-2+cnt;
+    cout << m << '\n';
+    for(int i = 3; i<=N; i++) {
+        if(visited[i] == true)
+            continue;
+        cout << i << " " << N << '\n';
+    }
+
+    for(int i = 0; i<v.size(); i++) {
+        cout << v[i].first << " " << v[i].second << '\n';
+        cout << v[i].first << " " << v[i].second << '\n';
+        visited[v[i].first] = 0;
+        visited[v[i].second] = 0;
+    }
+}
+
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
+    cin >> T;
+ 
+    for(int i = 0; i<T; i++) {
+        cin >> N;
+
+        solve();
+    }
+ 
+    return 0;
+}

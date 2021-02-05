@@ -1,0 +1,56 @@
+#include <iostream>
+#include <deque>
+#include <algorithm>
+ 
+using namespace std;
+ 
+typedef long long ll;
+typedef pair<int, ll> pil;
+ 
+const int S = 3e5;
+int T, N, M;
+ll k[S+5], c[S+5];
+deque<int> dq;
+ 
+ll solve() {
+    dq.clear();
+    sort(k+1, k+N+1);
+    for(int i = 1; i<=M; i++)
+        dq.push_back(i);
+ 
+    ll ret = 0;
+    for(int i = N; i>=1; i--) {
+        if(dq.empty()) {
+            ret += c[k[i]];
+            continue;
+        }
+ 
+        int lo = dq.front();
+        if(c[lo] < c[k[i]]) {
+            dq.pop_front();
+            ret += c[lo];
+        }
+        else
+            ret += c[k[i]];
+    }
+    return ret;
+}
+ 
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
+    cin >> T;
+ 
+    for(int i = 0; i<T; i++) {
+        cin >> N >> M;
+ 
+        for(int j = 1; j<=N; j++)
+            cin >> k[j];
+        for(int j = 1; j<=M; j++)
+            cin >> c[j];
+        
+        cout << solve() << '\n';
+    }
+ 
+    return 0;
+}

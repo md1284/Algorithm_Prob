@@ -1,0 +1,37 @@
+#include <iostream>
+ 
+using namespace std;
+ 
+int T, N;
+string s;
+ 
+bool solve() {
+    int cnt = 0;
+    for(int i = N-1; i>=0; i--) {
+        if(s[i] == ')')
+            cnt++;
+        else
+            break;
+    }
+ 
+    if(cnt > N-cnt)
+        return true;
+    return false;
+}
+ 
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
+    cin >> T;
+ 
+    for(int i = 0; i<T; i++) {
+        cin >> N >> s;
+        
+        if(solve() == true)
+            cout << "YES" << '\n';
+        else
+            cout << "NO" << '\n';
+    }
+ 
+    return 0;
+}

@@ -1,0 +1,51 @@
+#include <iostream>
+ 
+using namespace std;
+ 
+int T;
+string s;
+ 
+bool solve() {
+    int n = s.size();
+    int p1 = -1, p2 = -1;
+    for(int i = 0; i<s.size(); i++) {
+        if(p1 == -1) {
+            if(s[i] == '(' || s[i] == ')')
+                p1 = i;
+        }
+        else {
+            if(s[i] == '(' || s[i] == ')')
+                p2 = i;
+        }
+    }
+ 
+    int c1 = p1, c2 = p2-p1-1, c3 = n-p2-1;
+    
+    if(s[p1] == '(') {
+        if((c1+c2+c3)%2==0)
+            return true;
+        return false;
+    }
+    else {
+        if(c1>=1 && c3>=1 && (c1+c2+c3)%2==0)
+            return true;
+        return false;
+    }
+}
+ 
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
+    cin >> T;
+ 
+    for(int i = 0; i<T; i++) {
+        cin >> s;
+ 
+        if(solve() == true)
+            cout << "YES" << '\n';
+        else
+            cout << "NO" << '\n';
+    }
+ 
+    return 0;
+}
