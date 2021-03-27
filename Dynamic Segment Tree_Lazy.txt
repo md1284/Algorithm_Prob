@@ -1,0 +1,84 @@
+typedef long long ll;
+
+struct Node {
+    int l, r;
+    ll v;
+    Node() {
+        l = -1;
+        r = -1;
+        v = 0;
+    }
+};
+
+const int S = 5e4, MX = 1e9;
+int N;
+Node Tree[40*4*S+5];
+ll lazy[40*4*S+5];
+int pv = 2;
+
+void lp(ll b, ll s, ll e) {
+    if(b == -1)
+        return;
+    if(lazy[b] == 0)
+        return;
+
+    Tree[b].v += (e-s+1) * lazy[b];
+    if(s != e) {
+        if(Tree[b].l == -1)
+            Tree[b].l = pv++;
+        if(Tree[b].r == -1)
+            Tree[b].r = pv++;
+
+        lazy[Tree[b].l] += lazy[b];
+        lazy[Tree[b].r] += lazy[b];
+    }
+    lazy[b] = 0;
+}
+
+void update(ll b, ll s, ll e, ll l, ll r, ll v) {
+    lp(b, s, e);
+
+    if(r < s || e < l)
+        return;
+    if(l <= s && e <= r) {
+        Tree[b].v += (e-s+1) * v;
+        if(s != e) {
+            if(Tree[b].l == -1)
+                Tree[b].l = pv++;
+            if(Tree[b].r == -1)
+                Tree[b].r = pv++;
+
+            lazy[Tree[b].l] += v;
+            lazy[Tree[b].r] += v;
+        }
+        return;
+    }
+
+    ll mid = (s+e)/2;
+    if(Tree[b].l == -1)
+        Tree[b].l = pv++;
+    if(Tree[b].r == -1)
+        Tree[b].r = pv++;
+
+    update(Tree[b].l, s, mid, l, r, v);
+    update(Tree[b].r, mid+1, e, l, r, v);
+
+    ll t1 = Tree[b].l != -1 ? Tree[Tree[b].l].v : 0;
+    ll t2 = Tree[b].r != -1 ? Tree[Tree[b].r].v : 0;
+    Tree[b].v = t1 + t2;
+
+}
+
+ll get(ll b, ll s, ll e, ll l, ll r) {
+    lp(b, s, e);
+
+    if(b == -1)
+        return 0;
+    if(r < s || e < l)
+        return 0;
+    if(l <= s && e <= r)
+        return Tree[b].v;
+    
+    ll mid = (s+e)/2;
+    return get(Tree[b].l, s, mid, l, r) + get(Tree[b].r, mid+1, e, l, r);
+}

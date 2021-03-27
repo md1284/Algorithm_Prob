@@ -1,0 +1,149 @@
+#include <iostream>
+#include <cmath>
+
+using namespace std;
+
+typedef long long ll;
+
+const int S = 1e5;
+int N, Q;
+ll a[S+5], Tree[4*S+5], lazy[4*S+5], gTree[4*S+5];
+
+ll gcd(ll p, ll q) {
+    if(q < p)
+        swap(p,q);
+    if(p == 0)
+        return q;
+    return gcd(p, q%p);
+}
+
+void lp(int b, int s, int e, int l, int r) {
+    if(lazy[b] == 0)
+        return;
+    
+    Tree[b] += ((ll)e-s+1)*lazy[b];
+    if(s != e) {
+        lazy[b*2] += lazy[b];
+        lazy[b*2+1] += lazy[b];
+    }
+    lazy[b] = 0;
+}
+
+void init(int b, int s, int e) {
+    if(s == e) {
+        Tree[b] = a[s];
+        return;
+    }
+
+    int mid = (s+e)/2;
+    init(b*2, s, mid);
+    init(b*2+1, mid+1, e);
+    Tree[b] = Tree[b*2] + Tree[b*2+1];
+}
+
+void update(int b, int s, int e, int l, int r, ll x) {
+    lp(b, s, e, l, r);
+
+    if(r < s || e < l)
+        return;
+    if(l <= s && e <= r) {
+        Tree[b] += ((ll)e-s+1)*x;
+        if(s != e) {
+            lazy[b*2] += x;
+            lazy[b*2+1] += x;
+        }
+        return;
+    }
+
+    int mid = (s+e)/2;
+    update(b*2, s, mid, l, r, x);
+    update(b*2+1, mid+1, e, l, r, x);
+    Tree[b] = Tree[b*2] + Tree[b*2+1];
+}
+
+ll get(int b, int s, int e, int l, int r) {
+    lp(b, s, e, l, r);
+
+    if(r < s || e < l)
+        return 0;
+    if(l <= s && e <= r)
+        return Tree[b];
+    
+    int mid = (s+e)/2;
+    return get(b*2,s,mid,l,r) + get(b*2+1,mid+1,e,l,r);
+}
+
+void ginit(int b, int s, int e) {
+    if(s == e) {
+        if(s == 1)
+            gTree[b] = a[s];
+        else
+            gTree[b] = abs(a[s]-a[s-1]);
+        return;
+    }
+
+    int mid = (s+e)/2;
+    ginit(b*2, s, mid);
+    ginit(b*2+1, mid+1, e);
+    gTree[b] = gcd(gTree[b*2], gTree[b*2+1]);
+}
+
+void gupdate(int b, int s, int e, int n, ll x) {
+    if(n < s || e < n)
+        return;
+    if(s == e) {
+        if(s == 1)
+            gTree[b] = get(1,1,N,n,n);
+        else
+            gTree[b] = abs(get(1,1,N,n,n) - get(1,1,N,n-1,n-1));
+        return;
+    }
+
+    int mid = (s+e)/2;
+    gupdate(b*2, s, mid, n, x);
+    gupdate(b*2+1, mid+1, e, n, x);
+    gTree[b] = gcd(gTree[b*2], gTree[b*2+1]);
+}
+
+ll gget(int b, int s, int e, int l, int r) {
+    if(r < s || e < l)
+        return 0;
+    if(l <= s && e <= r)
+        return gTree[b];
+    
+    int mid = (s+e)/2;
+    return gcd(gget(b*2,s,mid,l,r), gget(b*2+1,mid+1,e,l,r));
+}
+
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
+    cin >> N;
+    
+    for(int i = 1; i<=N; i++)
+        cin >> a[i];
+    init(1,1,N);
+    ginit(1,1,N);
+
+    cin >> Q;
+    for(int i = 1; i<=Q; i++) {
+        ll t;
+        int a,b;
+        cin >> t >> a >> b;
+
+        if(t == 0) {
+            if(b-a+1 >= 3)
+                cout << gcd(get(1,1,N,a,a), gcd(get(1,1,N,b,b), gget(1,1,N,a+1,b-1))) << '\n';
+            else
+                cout << gcd(get(1,1,N,a,a), get(1,1,N,b,b)) << '\n';
+        }
+        else {
+            update(1,1,N,a,b,t);
+            gupdate(1,1,N,a,0);
+            if(b != N)
+                gupdate(1,1,N,b+1,0);
+        }
+    }
+ 
+    return 0;
+}

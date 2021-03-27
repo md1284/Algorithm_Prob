@@ -1,0 +1,186 @@
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+typedef long long ll;
+
+const int S = 1e5;
+int N, Q;
+ll a[S+5], Tree[4*S+5];
+int w[S+5], p[S+5], d[S+5], inv[S+5], discovered[S+5], hld[S+5];
+int t = 1;
+vector<int> adj[S+5];
+
+void init(int b, int s, int e) {
+    if(s == e) {
+        Tree[b] = a[inv[s]];
+        return;
+    }
+
+    int mid = (s+e)/2;
+    init(b*2, s, mid);
+    init(b*2+1, mid+1, e);
+    Tree[b] = Tree[b*2] ^ Tree[b*2+1];
+}
+
+void update(int b, int s, int e, int n, ll x) {
+    if(n < s || e < n)
+        return;
+    
+    if(s == e) {
+        Tree[b] = x;
+        return;
+    }
+
+    int mid = (s+e)/2;
+    update(b*2, s, mid, n, x);
+    update(b*2+1, mid+1, e, n, x);
+    Tree[b] = Tree[b*2] ^ Tree[b*2+1];
+}
+
+ll get(int b, int s, int e, int l, int r) {
+    if(r < s || e < l)
+        return 0;
+    if(l <= s && e <= r)
+        return Tree[b];
+    
+    int mid = (s+e)/2;
+    return get(b*2, s, mid, l, r) ^ get(b*2+1, mid+1, e, l, r);
+}
+
+void dfs(int here) {
+    w[here] = 1;
+
+    for(int i = 0; i<adj[here].size(); i++) {
+        int there = adj[here][i];
+
+        if(w[there] != 0)
+            continue;
+        p[there] = here;
+        d[there] = d[here]+1;
+        dfs(there);
+        w[here] += w[there];
+    }
+}
+
+void dfs2(int here) {
+    int mx = -1;
+    inv[t] = here;
+    discovered[here] = t++;
+
+    for(int i = 0; i<adj[here].size(); i++) {
+        int there = adj[here][i];
+
+        if(w[there] < w[here] && (mx == -1 || w[mx] < w[there]))
+            mx = there;
+    }
+    if(mx == -1)
+        return;
+    
+    hld[mx] = hld[here];
+    dfs2(mx);
+    for(int i = 0; i<adj[here].size(); i++) {
+        int there = adj[here][i];
+
+        if(w[there] < w[here] && mx != there) {
+            hld[there] = there;
+            dfs2(there);
+        }
+    }
+}
+
+ll query(int u, int v) {
+    ll ret = 0;
+    while(hld[u] != hld[v]) {
+        if(d[hld[u]] < d[hld[v]])
+            swap(u,v);
+
+        ret ^= get(1,1,N,discovered[hld[u]],discovered[u]);
+        u = p[hld[u]];
+    }
+
+    if(d[u] > d[v])
+        swap(u,v);
+    return ret ^ get(1,1,N,discovered[u],discovered[v]);
+}
+
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
+    cin >> N >> Q;
+
+    for(int i = 1; i<=N; i++)
+        cin >> a[i];
+    for(int i = 1; i<=N-1; i++) {
+        int u, v;
+        cin >> u >> v;
+
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+
+    dfs(1);
+    dfs2(1);
+    init(1,1,N);
+
+    for(int i = 1; i<=Q; i++) {
+        int t, u, v;
+        cin >> t >> u >> v;
+
+        if(t == 1)
+            update(1,1,N,discovered[u],v);
+        else
+            cout << query(u,v) << '\n';
+    }
+ 
+    return 0;
+}
+
+
+
+////////////////////////////// lazy //////////////////////////////
+
+vector<int> adj[100000];
+int node_cnt, W[100000], num[100000], hld[100000], parent[100000], depth[100000];
+void dfs(int c)
+{
+	W[c]=1;
+	for(auto n: adj[c]) if(W[n]==0) {
+		parent[n]=c;
+		depth[n]=depth[c]+1;
+		dfs(n);
+		W[c]+=W[n];
+	}
+}
+void dfs2(int c)
+{
+	int mx=-1;
+	num[c]=node_cnt++;
+	for(auto n: adj[c]) if(W[n]<W[c] && (mx==-1 || W[mx]<W[n])) mx=n;
+	if(mx==-1) return;
+	hld[mx]=hld[c];
+	dfs2(mx);
+	for(auto n: adj[c]) if(W[n]<W[c] && mx!=n) dfs2(hld[n]=n);
+}
+void update(int a, int b, int v)
+{
+	while(hld[a]!=hld[b]) {
+		if(depth[hld[a]]<depth[hld[b]]) swap(a,b);
+		update_segment_tree(num[hld[a]],num[a],v);
+		a=parent[hld[a]];
+	}
+	if(depth[a]>depth[b]) swap(a,b);
+	add_tree(num[a],num[b],v);
+}
+int query(int a, int b)
+{
+	int ret=0;
+	while(hld[a]!=hld[b]) {
+		if(depth[hld[a]]<depth[hld[b]]) swap(a,b);
+		ret+=query_segment_tree(num[hld[a]],num[a]);
+		a=parent[hld[a]];
+	}
+	if(depth[a]>depth[b]) swap(a,b);
+	return ret+query_segment_tree(num[a],num[b]);
+}

@@ -1,0 +1,154 @@
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+typedef long long ll;
+
+struct P {
+    int v, w, idx;
+};
+
+const int S = 1e5;
+int N, Q;
+ll a[S+5], Tree[4*S+5];
+int w[S+5], p[S+5], d[S+5], dis2node[S+5], node2idx[S+5], idx2node[S+5], discovered[S+5], hld[S+5];
+int t = 1;
+vector<P> adj[S+5];
+
+void init(int b, int s, int e) {
+    if(s == e) {
+        Tree[b] = a[node2idx[dis2node[s]]];
+        return;
+    }
+
+    int mid = (s+e)/2;
+    init(b*2, s, mid);
+    init(b*2+1, mid+1, e);
+    Tree[b] = max(Tree[b*2], Tree[b*2+1]);
+}
+
+void update(int b, int s, int e, int n, ll x) {
+    if(n < s || e < n)
+        return;
+    
+    if(s == e) {
+        Tree[b] = x;
+        return;
+    }
+
+    int mid = (s+e)/2;
+    update(b*2, s, mid, n, x);
+    update(b*2+1, mid+1, e, n, x);
+    Tree[b] = max(Tree[b*2], Tree[b*2+1]);
+}
+
+ll get(int b, int s, int e, int l, int r) {
+    if(r < s || e < l)
+        return 0;
+    if(l <= s && e <= r)
+        return Tree[b];
+    
+    int mid = (s+e)/2;
+    return max(get(b*2, s, mid, l, r), get(b*2+1, mid+1, e, l, r));
+}
+
+void dfs(int here) {
+    w[here] = 1;
+
+    for(int i = 0; i<adj[here].size(); i++) {
+        int there = adj[here][i].v;
+        int cost = adj[here][i].w;
+        int idx = adj[here][i].idx;
+
+        if(w[there] != 0)
+            continue;
+        a[idx] = cost;
+        node2idx[there] = idx;
+        idx2node[idx] = there;
+        p[there] = here;
+        d[there] = d[here]+1;
+        dfs(there);
+        w[here] += w[there];
+    }
+}
+
+void dfs2(int here) {
+    int mx = -1;
+    dis2node[t] = here;
+    discovered[here] = t++;
+
+    for(int i = 0; i<adj[here].size(); i++) {
+        int there = adj[here][i].v;
+
+        if(w[there] < w[here] && (mx == -1 || w[mx] < w[there]))
+            mx = there;
+    }
+    if(mx == -1)
+        return;
+    
+    hld[mx] = hld[here];
+    dfs2(mx);
+    for(int i = 0; i<adj[here].size(); i++) {
+        int there = adj[here][i].v;
+
+        if(w[there] < w[here] && mx != there) {
+            hld[there] = there;
+            dfs2(there);
+        }
+    }
+}
+
+ll query(int u, int v) {
+
+    ll ret = 0;
+    while(hld[u] != hld[v]) {
+        if(d[hld[u]] < d[hld[v]])
+            swap(u,v);
+
+        if(hld[u] != u)
+            ret = max(ret, get(1,1,N,discovered[hld[u]]+1,discovered[u]));
+        ret = max(ret, a[node2idx[hld[u]]]);
+        u = p[hld[u]];
+    }
+
+    if(d[u] > d[v])
+        swap(u,v);
+    
+    if(u == v)
+        return ret;
+    return max(ret, get(1,1,N,discovered[u]+1,discovered[v]));
+}
+
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
+    cin >> N;
+
+    for(int i = 1; i<=N-1; i++) {
+        int u, v, w;
+        cin >> u >> v >> w;
+
+        adj[u].push_back({v,w,i});
+        adj[v].push_back({u,w,i});
+    }
+
+    dfs(1);
+    dfs2(1);
+    init(1,1,N);
+
+    cin >> Q;
+    for(int i = 1; i<=Q; i++) {
+        int t, u, v;
+        cin >> t >> u >> v;
+
+        if(t == 1) {
+            update(1,1,N,discovered[idx2node[u]],v);
+            a[u] = v;
+        }
+        else
+            cout << query(u,v) << '\n';
+    }
+ 
+    return 0;
+}

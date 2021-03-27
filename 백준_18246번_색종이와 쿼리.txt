@@ -9,7 +9,7 @@ class seg2d {
 public:
     int n;
     vector<vector<ll>> a;
-    seg2d(int n) : n(n), a(2*n, vector<ll>(2*n)) {}
+    seg2d(int n) : n(n), a(2*n, vector<ll>(2*n,0)) {}
 
     void init(vector<vector<ll>> &v) {
         for(int i = 0; i<n; i++) {
@@ -19,26 +19,24 @@ public:
 
         for(int i = n; i<2*n; i++) {
             for(int j = n-1; j>0; j--)
-                a[i][j] = a[i][j<<1] + a[i][j<<1|1];
+                a[i][j] = max(a[i][j<<1], a[i][j<<1|1]);
         }
 
         for(int i = n-1; i>0; i--) {
             for(int j = 1; j<2*n; j++)
-                a[i][j] = a[i<<1][j] + a[i<<1|1][j];
+                a[i][j] = max(a[i<<1][j], a[i<<1|1][j]);
         }
     }
 
     void update(int y, int x, ll v) {
-        y--;
-        x--;
         a[y+n][x+n] = v;
 
         for(int i = x+n; i>1; i>>=1)
-            a[y+n][i>>1] = a[y+n][i] + a[y+n][i^1];
+            a[y+n][i>>1] = max(a[y+n][i], a[y+n][i^1]);
         
         for(y = y+n; y>1; y>>=1) {
             for(int i = x+n; i>=1; i>>=1)
-                a[y>>1][i] = a[y][i] + a[y^1][i];
+                a[y>>1][i] = max(a[y][i], a[y^1][i]);
         }
     }
 
@@ -46,30 +44,26 @@ public:
         ll ret = 0;
         for(x1 += n, x2 += n+1; x1<x2; x1>>=1, x2>>=1) {
             if(x1&1)
-                ret += a[y][x1++];
+                ret = max(ret, a[y][x1++]);
             if(x2&1)
-                ret += a[y][--x2];
+                ret = max(ret, a[y][--x2]);
         }
         return ret;
     }
 
     ll get(int y1, int x1, int y2, int x2) {
-        y1--;
-        x1--;
-        y2--;
-        x2--;
-
         ll ret = 0;
         for(y1 += n, y2 += n+1; y1<y2; y1>>=1, y2>>=1) {
             if(y1&1)
-                ret += get1d(y1++, x1, x2);
+                ret = max(ret, get1d(y1++, x1, x2));
             if(y2&1)
-                ret += get1d(--y2, x1, x2);
+                ret = max(ret, get1d(--y2, x1, x2));
         }
         return ret;
     }
 };
 
+const int S = 1500;
 int N, M;
 
 int main() {
@@ -77,26 +71,36 @@ int main() {
     cin.tie(NULL); cout.tie(NULL);
     cin >> N >> M;
 
-    seg2d Tree(N);
-    vector<vector<ll>> a(2*N, vector<ll>(2*N));
+    seg2d Tree(S+5);
+    vector<vector<ll>> a(2*S, vector<ll>(2*S,0));
 
-    for(int i = 0; i<N; i++) {
-        for(int j = 0; j<N; j++)
-            cin >> a[i][j];
+    for(int i = 1; i<=N; i++) {
+        int y1, x1, y2, x2;
+        cin >> y1 >> x1 >> y2 >> x2;
+    
+        a[y1][x1]++;
+        a[y1][x2]--;
+        a[y2][x1]--;
+        a[y2][x2]++;
+    }
+
+    for(int y = 0; y<1500; y++) {
+        for(int x = 1; x<1500; x++)
+            a[y][x] += a[y][x-1];
+    }
+    for(int x = 0; x<1500; x++) {
+        for(int y = 1; y<1500; y++)
+            a[y][x] += a[y-1][x];
     }
 
     Tree.init(a);
-
     for(int i = 1; i<=M; i++) {
-        int w, y1, x1, y2, x2;
-        cin >> w >> y1 >> x1 >> y2;
+        int y1, x1, y2, x2;
+        cin >> y1 >> x1 >> y2 >> x2;
+        y2--;
+        x2--;
 
-        if(w == 0)
-            Tree.update(y1, x1, y2);
-        else {
-            cin >> x2;
-            cout << Tree.get(y1, x1, y2, x2) << '\n';
-        }
+        cout << Tree.get(y1,x1,y2,x2) << '\n';
     }
  
     return 0;
