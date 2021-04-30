@@ -1,0 +1,29 @@
+void dijkstra() {
+    memset(visited, 0, sizeof(visited));
+    for (int i = 0; i < N; i++)
+        dist[i] = INF;
+    dist[S] = 0;
+    priority_queue<pii, vector<pii>, greater<pii>> pq;
+    pq.push({0, S});
+
+    while (!pq.empty()) {
+        int here = pq.top().second;
+        int cost = pq.top().first;
+        pq.pop();
+
+        if (visited[here] == true)
+            continue;
+        visited[here] = true;
+        dist[here] = min(dist[here], cost);
+
+        for (int i = 0; i < adj[here].size(); i++) {
+            int there = adj[here][i].first;
+            int tcost = adj[here][i].second;
+
+            if (fd[here][there] == true)
+                continue;
+
+            pq.push({ dist[here] + tcost, there });
+        }
+    }
+}
