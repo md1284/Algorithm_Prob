@@ -1,0 +1,67 @@
+typedef long long ll;
+
+const ll INF = 1e18;
+
+struct seg {
+	ll a, b;
+	ll get(ll x){
+		return a * x + b;
+	}
+};
+
+struct Node {
+	int l, r;
+	ll s, e;
+	seg sg;
+};
+
+struct Li_Chao {
+	vector<Node> Tree;
+
+	void init(ll s, ll e){
+		Tree.push_back({-1, -1, s, e, {0, -INF}});
+	}
+
+	void update(int node, seg v) {
+		ll s = Tree[node].s, e = Tree[node].e;
+		ll mid = (s+e)/2;
+
+		seg lo = Tree[node].sg, hi = v;
+		if(lo.get(s) > hi.get(s))
+			swap(lo, hi);
+		
+		if(lo.get(e) <= hi.get(e)) {
+			Tree[node].sg = hi;
+			return;
+		}
+		
+		if(lo.get(mid) < hi.get(mid)) {
+			Tree[node].sg = hi;
+			if(Tree[node].r == -1) {
+				Tree[node].r = Tree.size();
+				Tree.push_back({-1, -1, mid+1, e, {0, -INF}});
+			}
+			update(Tree[node].r, lo);
+		}
+		else {
+			Tree[node].sg = lo;
+			if(Tree[node].l == -1) {
+				Tree[node].l = Tree.size();
+				Tree.push_back({-1, -1, s, mid, {0, -INF}});
+			}
+			update(Tree[node].l, hi);
+		}
+	}
+
+	ll query(int node, ll x) {
+		if(node == -1)
+			return -INF;
+		
+		ll s = Tree[node].s, e = Tree[node].e;
+		ll mid = (s+e)/2;
+
+		if(x <= mid)
+			return max(Tree[node].sg.get(x), query(Tree[node].l, x));
+		return max(Tree[node].sg.get(x), query(Tree[node].r, x));
+	}
+} lc_tree;
