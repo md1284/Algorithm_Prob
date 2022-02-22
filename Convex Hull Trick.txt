@@ -1,0 +1,40 @@
+struct seg {
+	ll m, c;
+	double pt;
+};
+
+vector<seg> p;
+
+double cross(const seg& s1, const seg& s2) {
+	return (-1.0 * s1.c + s2.c) / (1.0 * s1.m - s2.m);
+}
+
+ll solve() {
+	for(int i = 1; i<=N; i++) {
+		seg s = {dp[i-1], dp[i-1], 0};
+
+		while(!p.empty()) {
+			seg s1 = p.back();
+			s.pt = cross(s, s1);
+
+			if(s1.pt < s.pt)
+				break;
+			p.pop_back();
+		}
+		p.push_back(s);
+
+		ll x = w[i];
+		int lo = 0, hi = p.size()-1, mid;
+		while(lo <= hi) {
+			mid = (lo+hi)/2;
+
+			if(p[mid].pt <= x)
+				lo = mid+1;
+			else
+				hi = mid-1;
+		}
+		dp[i] = p[hi].m * x + p[hi].c;
+	}
+	
+	return dp[N];
+}
