@@ -1,29 +1,43 @@
+typedef long long ll;
+
 struct seg {
 	ll m, c;
 	double pt;
 };
 
-vector<seg> p;
+struct CHT {
+	int s = 0, e = 0;
+	vector<seg> p;
 
-double cross(const seg& s1, const seg& s2) {
-	return (-1.0 * s1.c + s2.c) / (1.0 * s1.m - s2.m);
-}
+	double cross(const seg& s1, const seg& s2) {
+		return (-1.0 * s1.c + s2.c) / (1.0 * s1.m - s2.m);
+	}
 
-ll solve() {
-	for(int i = 1; i<=N; i++) {
-		seg s = {dp[i-1], dp[i-1], 0};
+	void init() {
+		p.clear();
+		s = 0, e = 0;
+	}
 
+	void insert(seg sg){
 		while(!p.empty()) {
-			seg s1 = p.back();
-			s.pt = cross(s, s1);
-
-			if(s1.pt < s.pt)
+			seg sg1 = p.back();
+			sg.pt = cross(sg, sg1);
+			
+			if(sg1.pt < sg.pt)
 				break;
 			p.pop_back();
 		}
-		p.push_back(s);
+		p.push_back(sg);
+    }
 
-		ll x = w[i];
+	ll get1(ll x) {
+		int e = p.size()-1;
+		while(s+1 <= e && p[s].m*x + p[s].c <= p[s+1].m*x + p[s+1].c)
+			s++;
+		return p[s].m * x + p[s].c;
+	}
+
+	ll get2(ll x) {
 		int lo = 0, hi = p.size()-1, mid;
 		while(lo <= hi) {
 			mid = (lo+hi)/2;
@@ -33,8 +47,6 @@ ll solve() {
 			else
 				hi = mid-1;
 		}
-		dp[i] = p[hi].m * x + p[hi].c;
+		return p[hi].m * x + p[hi].c;
 	}
-	
-	return dp[N];
-}
+} cht;
