@@ -28,7 +28,7 @@ struct CHT {
 			p.pop_back();
 		}
 		p.push_back(sg);
-    }
+	}
 
 	ll get1(ll x) {
 		int e = p.size()-1;
